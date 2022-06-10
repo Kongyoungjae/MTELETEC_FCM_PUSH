@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration>
+	
+	<Properties>
+		<Property name="fPath">/logs/spamansim</Property>
+		<Property name="fName">${fPath}/spamansim.log</Property>
+		<Property name="fPattern">${fPath}/spamansim_%d{yyyy-MM-dd-HH}.log</Property>
+		<Property name="layoutPattern">[%t] %d %-5p %c.%M:%L - %m%n</Property>
+	</Properties>
+
+	<!-- Appender, Layout 설정 -->
+	<Appenders>
+	
+		<Console name="console" target="SYSTEM_OUT">
+			<PatternLayout pattern="${layoutPattern}" />
+		</Console>
+		
+		<RollingFile name="file" fileName="${fName}" filePattern="${fPattern}" append="true">
+			
+			<PatternLayout pattern="${layoutPattern}" />
+			<Policies>
+				<TimeBasedTriggeringPolicy interval="1" modulate="true"/>
+			</Policies>
+			<DefaultRolloverStrategy>
+				<Delete basePath="${fPath}/" maxDepth="1">
+					<IfFileName glob="spamansim_*" />
+					<IfLastModified age="14d" />
+				</Delete>
+			</DefaultRolloverStrategy>
+			
+		</RollingFile>
+		
+	</Appenders>
+	
+	<!-- Logger 설정 -->
+	<!-- LOC -->
+	<Loggers>
+		<Root level="info" additivity="false" >
+			<AppenderRef ref="console" />
+		</Root>
+		
+		<Logger name="db" level="DEBUG" additivity="false">
+			<AppenderRef ref="console" />
+		</Logger>
+		
+		<Logger name="info" level="DEBUG" additivity="false">
+			<AppenderRef ref="console" />
+		</Logger>
+		
+		<Logger name="main" level="DEBUG" additivity="false">
+			<AppenderRef ref="console" />
+		</Logger>
+		
+		<Logger name="socket" level="DEBUG" additivity="false">
+			<AppenderRef ref="console" />
+		</Logger>
+		
+		<Logger name="thread" level="DEBUG" additivity="false">
+			<AppenderRef ref="console" />
+		</Logger>
+		
+		<Logger name="util" level="DEBUG" additivity="false">
+			<AppenderRef ref="console" />
+		</Logger>
+	</Loggers>
+	
+	<!-- PRD -->
+	<!-- 
+	<Loggers>
+		<Root level="ERROR" additivity="false" >
+			<AppenderRef ref="console" />
+			<AppenderRef ref="file" />
+		</Root>
+		
+		<Logger name="db" level="DEBUG" additivity="false">
+			<AppenderRef ref="file" />
+		</Logger>
+		
+		<Logger name="info" level="DEBUG" additivity="false">
+			<AppenderRef ref="file" />
+		</Logger>
+		
+		<Logger name="main" level="DEBUG" additivity="false">
+			<AppenderRef ref="file" />
+		</Logger>
+		
+		<Logger name="socket" level="DEBUG" additivity="false">
+			<AppenderRef ref="file" />
+		</Logger>
+		
+		<Logger name="thread" level="DEBUG" additivity="false">
+			<AppenderRef ref="file" />
+		</Logger>
+		
+		<Logger name="util" level="DEBUG" additivity="false">
+			<AppenderRef ref="file" />
+		</Logger>
+	</Loggers>
+	-->
+</Configuration>
