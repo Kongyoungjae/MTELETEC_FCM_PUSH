@@ -31,4 +31,10 @@ public class ExceptionHandler extends RuntimeException {
 		e.printStackTrace();
 		Main.run();
 	}
+
+	public ExceptionHandler(IOException e) {
+		logger.error("@@@FirebaseMessagingException 익셉션 @@@");
+		e.printStackTrace();
+		Main.run();	
+	}
 }
