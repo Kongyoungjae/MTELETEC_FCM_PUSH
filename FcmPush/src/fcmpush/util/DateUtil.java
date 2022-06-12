@@ -6,34 +6,39 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
 
+import javax.annotation.PropertyKey;
+
 public class DateUtil {
 
-	public Date getStartTime() {
-	  
-	  LocalDateTime localTime = LocalDateTime.now();
-	  LocalDateTime runTime = LocalDateTime.of(localTime.getYear(),localTime.getMonth(),localTime.getDayOfMonth(),5,4,40);
-	
-	  Instant instant = runTime.atZone(ZoneId.systemDefault()).toInstant();
-		  
-	  DateTimeFormatter dateFormat =  DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-	  System.out.println(runTime.format(dateFormat));
-	  
-	  Date date = java.sql.Timestamp.valueOf(runTime.format(dateFormat));
-	  
-	  return date; 
+	public Date todayFourAm() {	
+		LocalDateTime nowDateTime = LocalDateTime.now();
+		LocalDateTime startTime = LocalDateTime.of(
+				  nowDateTime.getYear()
+				, nowDateTime.getMonth()
+				, nowDateTime.getDayOfMonth()
+				, 11
+				, 0
+				, 0);
+		
+		Date date = Date.from(startTime.atZone(ZoneId.systemDefault()).toInstant());
+	 
+		return date; 
 	}
 	
-//	public Date getStartTime() {
-//		  
-//		  LocalDateTime localTime = LocalDateTime.now();
-//		  LocalDateTime runTime = LocalDateTime.of(localTime.getYear(),localTime.getMonth(),localTime.getDayOfMonth(),4,53,0);
-//		
-//		  Instant instant = runTime.atZone(ZoneId.systemDefault()).toInstant();
-//			  
-//		  DateTimeFormatter dateFormat =  DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss");
-//
-//		  Date date = java.sql.Timestamp.valueOf(runTime.format(dateFormat));
-//		  return date; 
-//		}
-
+	public static String todayHourMinute() {	
+		LocalDateTime nowDateTime = LocalDateTime.now();
+		LocalDateTime startTime = LocalDateTime.of(
+				  nowDateTime.getYear()
+				, nowDateTime.getMonth()
+				, nowDateTime.getDayOfMonth()
+				, nowDateTime.getHour()
+				, nowDateTime.getMinute()
+				, 0);
+		
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMddhhmm00");
+		
+		startTime.format(formatter);
+	 
+		return startTime.format(formatter); 
+	}
 }

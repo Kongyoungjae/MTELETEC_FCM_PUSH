@@ -18,6 +18,7 @@ import com.google.firebase.messaging.FirebaseMessaging;
 import fcmpush.config.DataBaseConfig;
 import fcmpush.config.FireBaseConfig;
 import fcmpush.repository.FireBaseRepository;
+import fcmpush.util.DateUtil;
 import fcmpush.util.StackTraceLogUtil;
 
 
@@ -27,18 +28,19 @@ public class FireBasePushService {
 	private FireBaseConfig fireBaseConfig;
 	private FireBaseRepository repository;
 	
+	public FireBasePushService() {
+		fireBaseConfig = new FireBaseConfig();
+		repository = new FireBaseRepository();	
+	}
+
 	public void push() {
-		
+
+		logger.info("push");
+		logger.info(repository.selectPushInfoByDateTime());
 	}
 	
 	public boolean checkPushTime() {	
 		return true;	
 	}
-	
-	public boolean checkPushCount() {
-		
-		return true;
-	}
-	
 	
 }

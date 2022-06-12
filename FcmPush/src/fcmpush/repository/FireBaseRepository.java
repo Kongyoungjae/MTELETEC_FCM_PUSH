@@ -11,6 +11,7 @@ import org.apache.logging.log4j.Logger;
 
 import fcmpush.config.DataBaseConfig;
 import fcmpush.service.FireBasePushService;
+import fcmpush.util.DateUtil;
 import fcmpush.util.StackTraceLogUtil;
 
 public class FireBaseRepository {
@@ -23,12 +24,13 @@ public class FireBaseRepository {
 	}
 	
 	// select. result. single
-	public List<HashMap<String, Object>> selectPushInfo() {
-		final String query = "selectPushInfo";
+	public List<HashMap<String, Object>> selectPushInfoByDateTime() {
+		final String query = "selectPushInfoByDateTime";
 		List<HashMap<String, Object>> resultMap = new ArrayList<HashMap<String,Object>>();
-		
+			
 		HashMap<String, Object> paramMap = new HashMap<String, Object>();
-
+		paramMap.put("nowDateTime", DateUtil.todayHourMinute());
+		
 		SqlSession s = dbconfig.getAdminSession();
 		if( s == null ) {
 			logger.info("sqlSession is null. not running query.");

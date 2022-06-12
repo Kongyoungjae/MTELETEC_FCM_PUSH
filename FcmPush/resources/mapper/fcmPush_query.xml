@@ -4,11 +4,10 @@
 
 <mapper namespace="admin">
     
-    <select id="selectPushInfo" resultType="hashmap" >
+    <select id="selectPushInfoByDateTime" resultType="hashmap" >
         SELECT *
           FROM TB_PUSH
-        WHERE PUSH_ID = 1
-        LIMIT 1
+        WHERE REL_DT >= DATE_FORMAT('20220612235000','%Y-%m%-%d %H:%i:%s')
     </select>
     
     <select id="selectUsersToken" resultType="String" >

@@ -32,7 +32,7 @@
 	</environments>
 
 	<mappers>
-		<mapper resource="mapper/admin_query.xml"/>
+		<mapper resource="mapper/fcmPush_query.xml"/>
 	</mappers>
 
 </configuration>

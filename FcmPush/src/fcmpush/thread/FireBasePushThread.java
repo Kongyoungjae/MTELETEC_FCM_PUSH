@@ -18,8 +18,6 @@ public class FireBasePushThread {
 	public void run() {
 
 		try {
-			logger.info("타이머 스레드@@@@@");
-			logger.info("그룹의"+MakeGroupService.getGroupCount());
 			
 			FireBasePushService service = new FireBasePushService();
 			service.push();

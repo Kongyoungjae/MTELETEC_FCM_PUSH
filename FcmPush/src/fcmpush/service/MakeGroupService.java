@@ -25,9 +25,8 @@ public class MakeGroupService {
 	private FireBaseConfig fireBaseConfig;
 	private FireBaseRepository repository;
 	private static FirebaseMessaging fireMessaing;
-	private static int totalGroupCount = 1;
+	private int groupSize = FireBasePushEnum.GROUP_SIZE.getSize();
 
-	
 	public MakeGroupService() {
 		fireBaseConfig = new FireBaseConfig();
 		repository = new FireBaseRepository();
@@ -47,30 +46,32 @@ public class MakeGroupService {
 	
 	public void makeReceiveUserGroup() throws IOException, FirebaseMessagingException {
     	
+		// todo push_group 삭제
+		
 		// List<String> tokens = repository.selectUsersToken();
 		List<String> tokens = new LinkedList<String>();
 		
 		for(int i=0; i < 10000; i++) {
 			 tokens.add("f_OoEVscSkCshbtP5cOFhh:APA91bH04xQltAKlGxcWcoQ_StyUkwXxbwenb4-fRViof424Vm5X5VXKGer7gGgxsbXRslkSZzC_hdPyoTYQu92SwtdKJ_Wknn1UgnjJhM0YxTlTp5q4VR3iMLUmwAuLrldHUc5xhU9a");
-			 tokens.add("dmDjI3yUS929jlJz1r3egf:APA91bFPsDWCS2UAAHGjynz8wpk3gii2ejWoSUs6iY19TnH818DpKrQpf3PJldWwc3D9ZrrpVt4C2t2K2R9ulDauwteSaMjzyMBZY3xtYudTAKSFM8-cPR8gOCwaSGfx4bOn4ldwrArj");
-			 tokens.add("d4ezIS3MQ2-ah0A2axdLa0:APA91bGHsL5LuPexm-OHsWG9UT1mQfm1i6cdGVArns0R-NFxCLRL4oqholKP6Jtu_BRvbVX4oYKNrDP6_n9JNv9LmQhN2DkWPXUzM2jTF6ACymFp3Nd8Fh9DvOuXIp1q1TgQY69cLXbI");
+			 tokens.add("dmDjI3yUS929jlJz1r3egf:APA91bFPsDWCS2UAAHGjynz8wpk3gii2ejWoSUs6iY19TnH818DpKrQpf3PJldWwc3D9ZrrpVt4C2t2K2R9ulDauwteSaMjzyMBZY3xtYudTAKSFM8-cPR8gOCwaSGfx4bOn4ldwrArj2");
+			 tokens.add("d4ezIS3MQ2-ah0A2axdLa0:APA91bGHsL5LuPexm-OHsWG9UT1mQfm1i6cdGVArns0R-NFxCLRL4oqholKP6Jtu_BRvbVX4oYKNrDP6_n9JNv9LmQhN2DkWPXUzM2jTF6ACymFp3Nd8Fh9DvOuXIp1q1TgQY69cLXbI3");
 			 
 		}
 		long currentTime = System.currentTimeMillis();
 
 		int groupSeq = 1;
-    	int groupSize = FireBasePushEnum.GROUP_SIZE.getSize();
     	
     	for(int i = 0; i < 10000; i += groupSize) {
     		logger.info(groupSeq + "번째 그룹 생성");
     		
     		List<String> newTokens = new LinkedList<String>();
 
+    		//마지막 그룹 만들때
     		if(i + groupSize > tokens.size()) {
     			newTokens = tokens.subList(i, tokens.size());
-    			
-    			totalGroupCount = groupSeq;
-    		} else {
+    		} 
+    		
+    		else {
         		newTokens = tokens.subList(i, i+groupSize);
     		}
     		    	
@@ -78,101 +79,15 @@ public class MakeGroupService {
     		
 			logger.info("토큰 등록 성공수:"+ response.getSuccessCount());
     		logger.info("토큰 등록 실패수:"+ response.getFailureCount());
-    		logger.info(response.getErrors().toString() + " tokens were subscribed Fail");  
-    		groupSeq += 1;
+    		
+    		groupSeq += 1;logger.info(response.getErrors().toString() + " tokens were subscribed Fail");  
+    		
+    		//todo 
+    		//tb_push_group , tb_push_group_hist insert 
+    		
     	}
     	
 		long afterTime = System.currentTimeMillis();
 		logger.info((afterTime - currentTime) / 1000);
     }
-	
-	public void makeReceiveUserGroup2() throws IOException, FirebaseMessagingException {
-    	
-		// List<String> tokens = repository.selectUsersToken();
-		List<String> tokens = new LinkedList<String>();
-		
-		for(int i=0; i <= 10000; i++) {
-			 tokens.add("f_OoEVscSkCshbtP5cOFhh:APA91bH04xQltAKlGxcWcoQ_StyUkwXxbwenb4-fRViof424Vm5X5VXKGer7gGgxsbXRslkSZzC_hdPyoTYQu92SwtdKJ_Wknn1UgnjJhM0YxTlTp5q4VR3iMLUmwAuLrldHUc5xhU9a");
-			 tokens.add("dmDjI3yUS929jlJz1r3egf:APA91bFPsDWCS2UAAHGjynz8wpk3gii2ejWoSUs6iY19TnH818DpKrQpf3PJldWwc3D9ZrrpVt4C2t2K2R9ulDauwteSaMjzyMBZY3xtYudTAKSFM8-cPR8gOCwaSGfx4bOn4ldwrArj");
-			 tokens.add("d4ezIS3MQ2-ah0A2axdLa0:APA91bGHsL5LuPexm-OHsWG9UT1mQfm1i6cdGVArns0R-NFxCLRL4oqholKP6Jtu_BRvbVX4oYKNrDP6_n9JNv9LmQhN2DkWPXUzM2jTF6ACymFp3Nd8Fh9DvOuXIp1q1TgQY69cLXbI");
-			 
-		}
-		
-		long currentTime = System.currentTimeMillis();
-
-		int groupSeq = 11;
-    	int groupSize = FireBasePushEnum.GROUP_SIZE.getSize();
-    	
-    	for(int i = 10000; i< 20000; i += groupSize) {
-    		logger.info(groupSeq + "번째 그룹 생성");
-    		
-    		List<String> newTokens = new LinkedList<String>();
-
-    		if(i + groupSize > tokens.size()) {
-    			newTokens = tokens.subList(i, tokens.size());
-    			
-    			totalGroupCount = groupSeq;
-    		} else {
-        		newTokens = tokens.subList(i, i+groupSize);
-    		}
-    		    	
-			TopicManagementResponse response = fireMessaing.subscribeToTopic(newTokens, FireBasePushEnum.GROUP_NAME.getValue() + groupSeq);
-    		
-			logger.info("토큰 등록 성공수:"+ response.getSuccessCount());
-    		logger.info("토큰 등록 실패수:"+ response.getFailureCount());
-    		logger.info(response.getErrors().toString() + " tokens were subscribed Fail");  
-    		groupSeq += 1;
-    	}
-    	
-		long afterTime = System.currentTimeMillis();
-		logger.info((afterTime - currentTime) / 1000);
-    }
-
-	
-//  원본	
-//	public void makeReceiveUserGroup() throws IOException, FirebaseMessagingException {
-//    	
-//		// List<String> tokens = repository.selectUsersToken();
-//		List<String> tokens = new LinkedList<String>();
-//		
-//		for(int i=0; i < 20000; i++) {
-//			 tokens.add("f_OoEVscSkCshbtP5cOFhh:APA91bH04xQltAKlGxcWcoQ_StyUkwXxbwenb4-fRViof424Vm5X5VXKGer7gGgxsbXRslkSZzC_hdPyoTYQu92SwtdKJ_Wknn1UgnjJhM0YxTlTp5q4VR3iMLUmwAuLrldHUc5xhU9a");
-//			 tokens.add("dmDjI3yUS929jlJz1r3egf:APA91bFPsDWCS2UAAHGjynz8wpk3gii2ejWoSUs6iY19TnH818DpKrQpf3PJldWwc3D9ZrrpVt4C2t2K2R9ulDauwteSaMjzyMBZY3xtYudTAKSFM8-cPR8gOCwaSGfx4bOn4ldwrArj");
-//			 tokens.add("d4ezIS3MQ2-ah0A2axdLa0:APA91bGHsL5LuPexm-OHsWG9UT1mQfm1i6cdGVArns0R-NFxCLRL4oqholKP6Jtu_BRvbVX4oYKNrDP6_n9JNv9LmQhN2DkWPXUzM2jTF6ACymFp3Nd8Fh9DvOuXIp1q1TgQY69cLXbI");
-//			 
-//		}
-//		long currentTime = System.currentTimeMillis();
-//
-//		int groupSeq = 1;
-//    	int groupSize = FireBasePushEnum.GROUP_SIZE.getSize();
-//    	
-//    	for(int i = 0; i < 20000; i += groupSize) {
-//    		logger.info(groupSeq + "번째 그룹 생성");
-//    		
-//    		List<String> newTokens = new LinkedList<String>();
-//
-//    		if(i + groupSize > tokens.size()) {
-//    			newTokens = tokens.subList(i, tokens.size());
-//    			
-//    			totalGroupCount = groupSeq;
-//    		} else {
-//        		newTokens = tokens.subList(i, i+groupSize);
-//    		}
-//    		    	
-//			TopicManagementResponse response = fireMessaing.subscribeToTopic(newTokens, FireBasePushEnum.GROUP_NAME.getValue() + groupSeq);
-//    		
-//			logger.info("토큰 등록 성공수:"+ response.getSuccessCount());
-//    		logger.info("토큰 등록 실패수:"+ response.getFailureCount());
-//    		logger.info(response.getErrors().toString() + " tokens were subscribed Fail");  
-//    		groupSeq += 1;
-//    	}
-//    	
-//		long afterTime = System.currentTimeMillis();
-//		logger.info((afterTime - currentTime) / 1000);
-//    }
-	
-	public static int getGroupCount() {
-		
-		return totalGroupCount;
-	}
 }
