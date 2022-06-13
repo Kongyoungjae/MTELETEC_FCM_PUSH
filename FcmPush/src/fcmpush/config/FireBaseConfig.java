@@ -2,12 +2,9 @@ package fcmpush.config;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
 
-import org.apache.ibatis.io.Resources;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.core.util.IOUtils;
 
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.firebase.FirebaseApp;
@@ -21,7 +18,7 @@ public class FireBaseConfig  {
 	private static FirebaseApp fireBaseApp;
 	
 	//ADC 인증
-	public FirebaseApp getFireBaseApp() throws IOException  {
+	public FirebaseApp initFireBaseApp() throws IOException  {
 		
 		if(fireBaseApp == null) {
 			logger.info("FirebaseApp 초기화");
@@ -35,7 +32,7 @@ public class FireBaseConfig  {
 		 return fireBaseApp; 
 	}
 	
-	// 사용자 인증 정보를 사용하여 액세스 토큰 발급
+	// OAUTH_2
 	public String getAccessToken() throws IOException {
 
 		InputStream resource = this.getClass().getClassLoader().getResourceAsStream(FireBasePushEnum.KEY_PATH.getValue());

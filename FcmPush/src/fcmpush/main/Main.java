@@ -41,18 +41,18 @@ public class Main {
 	public static void run () {
 		
 		try {
-			//수신그룹 만들기 스레드
+			// 수신그룹 만들기 스레드
 //			Timer receiveGroupTimer = new Timer();
 //			TimerTask makeReceiveGroupTask = new TimerTask() {			
 //				@Override
 //				public void run() {
 //					MakeGroupThread groupThread = new MakeGroupThread();
 //					groupThread.run();
-//				}
+//				}eBaseIntervalEnum.All_GROUP_CREATE_INTERVAL.getInterval());
+			
 //			};
 //			DateUtil dateUtil = new DateUtil();			
-//			receiveGroupTimer.scheduleAtFixedRate(makeReceiveGroupTask, dateUtil.todayFourAm() , FireBaseIntervalEnum.All_GROUP_CREATE_INTERVAL.getInterval());
-			
+//			receiveGroupTimer.scheduleAtFixedRate(makeReceiveGroupTask, dateUtil.todayFourAm() , Fir
 			//푸쉬 스레드
 			Timer pushTimer = new Timer();
 			TimerTask pushTask = new TimerTask() {			
@@ -64,7 +64,8 @@ public class Main {
 				}
 			};
 			pushTimer.scheduleAtFixedRate(pushTask, 0, 1000);
-			
+//			
+
 			Thread.sleep(1000);		
 
 		}

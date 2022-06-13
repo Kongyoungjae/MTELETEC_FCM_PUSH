@@ -1,16 +1,12 @@
 package fcmpush.thread;
 
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.HashMap;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import com.google.firebase.internal.FirebaseService;
-
-import fcmpush.main.Main;
 import fcmpush.service.FireBasePushService;
-import fcmpush.service.MakeGroupService;
+import fcmpush.util.DateUtil;
 
 public class FireBasePushThread {
 	private static final Logger logger = LogManager.getLogger();
@@ -18,10 +14,11 @@ public class FireBasePushThread {
 	public void run() {
 
 		try {
-			
+			HashMap<String, Object> map = new HashMap<String, Object>();
+			map.put("nowDateTime", DateUtil.getDateTime());
+					
 			FireBasePushService service = new FireBasePushService();
-			service.push();
-			
+			service.push(map);				
 		} catch(Exception e) {
 			e.printStackTrace();
 		}

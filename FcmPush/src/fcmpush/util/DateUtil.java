@@ -1,12 +1,9 @@
 package fcmpush.util;
 
-import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
-
-import javax.annotation.PropertyKey;
 
 public class DateUtil {
 
@@ -25,7 +22,7 @@ public class DateUtil {
 		return date; 
 	}
 	
-	public static String todayHourMinute() {	
+	public static String getDateTime() {	
 		LocalDateTime nowDateTime = LocalDateTime.now();
 		LocalDateTime startTime = LocalDateTime.of(
 				  nowDateTime.getYear()
@@ -35,7 +32,7 @@ public class DateUtil {
 				, nowDateTime.getMinute()
 				, 0);
 		
-		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMddhhmm00");
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMddHHmm00");
 		
 		startTime.format(formatter);
 	 

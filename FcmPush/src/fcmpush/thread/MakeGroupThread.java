@@ -5,13 +5,10 @@ import java.io.IOException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import com.google.firebase.FirebaseException;
 import com.google.firebase.messaging.FirebaseMessagingException;
 
-import fcmpush.config.FireBaseConfig;
 import fcmpush.exception.ErrorHandler;
 import fcmpush.exception.ExceptionHandler;
-import fcmpush.service.FireBasePushService;
 import fcmpush.service.MakeGroupService;
 
 public class MakeGroupThread {

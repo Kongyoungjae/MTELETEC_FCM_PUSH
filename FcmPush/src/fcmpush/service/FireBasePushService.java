@@ -1,25 +1,15 @@
 package fcmpush.service;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
-import org.apache.ibatis.io.Resources;
-import org.apache.ibatis.session.SqlSession;
-import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import com.google.firebase.messaging.FirebaseMessaging;
-
-import fcmpush.config.DataBaseConfig;
 import fcmpush.config.FireBaseConfig;
 import fcmpush.repository.FireBaseRepository;
-import fcmpush.util.DateUtil;
-import fcmpush.util.StackTraceLogUtil;
 
 
 public class FireBasePushService {
@@ -32,15 +22,47 @@ public class FireBasePushService {
 		fireBaseConfig = new FireBaseConfig();
 		repository = new FireBaseRepository();	
 	}
+	
+	public void push(HashMap<String, Object> nowDateTime) {
 
-	public void push() {
-
-		logger.info("push");
-		logger.info(repository.selectPushInfoByDateTime());
+		List<HashMap<String, Object>> pushList = repository.selectPushInfoByDateTime(nowDateTime);
+		
+		//푸쉬 시간이면서 중복 발송이 아닌경우(DB에서 HISTORY 테이블에서 확인)
+		if(isPushTime(pushList) && notDuplicatePush(pushList)) {
+			
+			logger.info("푸쉬 시간이면서 중복 발송이 아닌경우");
+		}
+				
 	}
 	
-	public boolean checkPushTime() {	
-		return true;	
+	private boolean isPushTime(List<HashMap<String, Object>> pushList) {	
+		
+		if (pushList.size() != 0) {
+			return true;
+		}
+		return false;
 	}
+	
+	private boolean notDuplicatePush(List<HashMap<String, Object>> pushList) {
+		
+		for(HashMap<String, Object> pushID: pushList) {		
+			List<HashMap<String,Object>> resultList = repository.selectPushHistByPushID(pushID);
+			if(resultList.size() != 0 ) {
+				return false;
+			}
+		}
+		return true;
+	}
+	
+	
+//  TODO(발송 타입별 메세지전송) 추후에 작성예정 발송타깃값에 따라서 RETURN TYPE이 달라질거임
+//	private String checkPushTarget(List<HashMap<String, Object>> pushList) {	
+//		
+//		for(HashMap<String, Object> map : pushList) {
+//			
+//		}
+//	}
+
+	
 	
 }

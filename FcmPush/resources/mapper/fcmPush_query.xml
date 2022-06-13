@@ -5,10 +5,26 @@
 <mapper namespace="admin">
     
     <select id="selectPushInfoByDateTime" resultType="hashmap" >
-        SELECT *
+       
+       SELECT 
+        	PUSH_ID
           FROM TB_PUSH
-        WHERE REL_DT >= DATE_FORMAT('20220612235000','%Y-%m%-%d %H:%i:%s')
+        WHERE 
+        <![CDATA[ REL_DT < DATE_FORMAT(#{nowDateTime},'%Y-%m%-%d %H:%i:%s') ]]>
+        	AND SEND_YN = 'Y'
     </select>
+    
+    <select id="selectPushHistByPushID" resultType="hashmap" >   
+    	SELECT 
+    		T1.PUSH_ID
+		 FROM TB_PUSH_HIST T1
+		INNER JOIN TB_PUSH T2 ON T1.PUSH_ID = T2.PUSH_ID
+		WHERE T1.PUSH_ID = #{PUSH_ID}
+		 AND SENT = 'Y'
+    </select>
+    
+    
+
     
     <select id="selectUsersToken" resultType="String" >
         SELECT 
@@ -19,7 +35,7 @@
 
     <select id="selectSMS" parameterType="hashmap" resultType="hashmap">
         select
-			SENDER
+			 SENDER
 			,RECVER
 			,MSG
         from

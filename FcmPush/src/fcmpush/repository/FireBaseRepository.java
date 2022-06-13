@@ -24,12 +24,13 @@ public class FireBaseRepository {
 	}
 	
 	// select. result. single
-	public List<HashMap<String, Object>> selectPushInfoByDateTime() {
+	public List<HashMap<String, Object>> selectPushInfoByDateTime(HashMap<String, Object> nowDateTime) {
 		final String query = "selectPushInfoByDateTime";
+		
 		List<HashMap<String, Object>> resultMap = new ArrayList<HashMap<String,Object>>();
 			
 		HashMap<String, Object> paramMap = new HashMap<String, Object>();
-		paramMap.put("nowDateTime", DateUtil.todayHourMinute());
+		paramMap.put("nowDateTime", DateUtil.getDateTime());
 		
 		SqlSession s = dbconfig.getAdminSession();
 		if( s == null ) {
@@ -47,6 +48,34 @@ public class FireBaseRepository {
 		
 		return resultMap;
 	}
+	
+	public List<HashMap<String, Object>> selectPushHistByPushID(HashMap<String, Object> pushID) {
+		final String query = "selectPushHistByPushID";
+		
+		List<HashMap<String, Object>> resultMap = new ArrayList<HashMap<String,Object>>();
+		
+		
+		HashMap<String, Object> paramMap = new HashMap<String, Object>();
+		paramMap.put("PUSH_ID", pushID.get("PUSH_ID"));	
+		
+		
+		SqlSession s = dbconfig.getAdminSession();
+		if( s == null ) {
+			logger.info("sqlSession is null. not running query.");
+			return null;
+		}
+		
+		try {
+			resultMap = s.selectList(query, paramMap);
+		} catch ( Exception e ) {
+			logger.error("exception/ SMSdao::selectOne()"+StackTraceLogUtil.getStackTraceString(e));
+		} finally {
+			s.close();
+		}
+		
+		return resultMap;		
+	}
+	
 	
 	// select. result. single
 	public List<String> selectUsersToken() {
@@ -69,6 +98,9 @@ public class FireBaseRepository {
 		
 		return tokens;
 	}
+	
+	
+
 	
 	
 	

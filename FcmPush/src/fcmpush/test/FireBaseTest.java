@@ -17,6 +17,7 @@ import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.FirebaseMessagingException;
+import com.google.firebase.messaging.MulticastMessage;
 import com.google.firebase.messaging.TopicManagementResponse;
 
 
@@ -36,13 +37,15 @@ public class FireBaseTest  {
 		logger.debug("LOG debug");
 		logger.error("LOG error");
 		logger.fatal("LOG fatal");
+		
+		
 
 
 	}
 	
 	
 	//ADC 인증
-//	private FirebaseApp getFireBaseApp() throws IOException {
+//	private FirebaseApp initFireBaseApp() throws IOException {
 //		final String KEY_PATH = "fireBase/serviceAccountKey.json";		
 //		ClassPathResource resource = new ClassPathResource(KEY_PATH);
 //		
@@ -144,7 +147,7 @@ public class FireBaseTest  {
 //	
 //    public void makeReceiveUserGroup() throws IOException {
 //    	final List<String> tokens = new ArrayList<String>();
-//    	FirebaseMessaging gg =FirebaseMessaging.getInstance(getFireBaseApp());
+//    	FirebaseMessaging gg =FirebaseMessaging.getInstance(initFireBaseApp());
 //    	
 //    	tokens.add("f_OoEVscSkCshbtP5cOFhh:APA91bH04xQltAKlGxcWcoQ_StyUkwXxbwenb4-fRViof424Vm5X5VXKGer7gGgxsbXRslkSZzC_hdPyoTYQu92SwtdKJ_Wknn1UgnjJhM0YxTlTp5q4VR3iMLUmwAuLrldHUc5xhU9a");
 //    	tokens.add("d4ezIS3MQ2-ah0A2axdLa0:APA91bGHsL5LuPexm-OHsWG9UT1mQfm1i6cdGVArns0R-NFxCLRL4oqholKP6Jtu_BRvbVX4oYKNrDP6_n9JNv9LmQhN2DkWPXUzM2jTF6ACymFp3Nd8Fh9DvOuXIp1q1TgQY69cLXbI");

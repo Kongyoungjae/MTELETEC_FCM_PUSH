@@ -9,7 +9,6 @@ import org.apache.ibatis.session.SqlSessionFactoryBuilder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import fcmpush.service.FireBasePushService;
 import fcmpush.util.StackTraceLogUtil;
 
 
