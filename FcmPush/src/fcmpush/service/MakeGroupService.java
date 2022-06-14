@@ -54,7 +54,7 @@ public class MakeGroupService {
 		
 		
 		deleteAllPushGroups();
-		// unSubscribeUserGroup(tokens);
+		unSubscribeUserGroup(tokens);
 		
 
 		long currentTime = System.currentTimeMillis();
@@ -91,17 +91,17 @@ public class MakeGroupService {
 	
 	
 	//  todo 구독취소..? 꼭해야하나? 수신그룹을 만들면 덮어씌워지긴하는데.. 
-	//	private void unSubscribeUserGroup(List<String> tokens) throws FirebaseMessagingException { 
-	//		
-	//		logger.info("unSubscribeUserGroup Call");
-	//		int groupSeq  = (int) Math.ceil(((double)tokens.size()) / groupSize);
-	//			
-	//    	for(int i = 0; i < groupSeq; i ++) {
-	//    		TopicManagementResponse response = fireMessaing.getInstance().
-	//    		logger.info("구독취소 요청 성공수"+response.getSuccessCount());
-	//    		logger.info("구독취소 요청 실패수"+response.getFailureCount());
-	//    	}
-	//	}
+	private void unSubscribeUserGroup(List<String> tokens) throws FirebaseMessagingException { 
+		
+		logger.info("unSubscribeUserGroup Call");
+		int groupSeq  = (int) Math.ceil(((double)tokens.size()) / groupSize);
+			
+    	for(int i = 0; i < groupSeq; i ++) {
+    		TopicManagementResponse response = fireMessaing.unsubscribeFromTopic(tokens, null);
+    		logger.info("구독취소 요청 성공수"+response.getSuccessCount());
+    		logger.info("구독취소 요청 실패수"+response.getFailureCount());
+    	}
+	}
 	
 	
 	private int deleteAllPushGroups() { 	

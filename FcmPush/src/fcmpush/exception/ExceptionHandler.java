@@ -1,6 +1,7 @@
 package fcmpush.exception;
 
 import java.io.IOException;
+import java.util.Timer;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -17,24 +18,20 @@ public class ExceptionHandler extends RuntimeException {
 	public ExceptionHandler(RuntimeException e) {
 		logger.error("@@@RuntimeException 익셉션 @@@");
 		e.printStackTrace();
-		Main.run();
 	}
 
 	public ExceptionHandler(InterruptedException e) {
 		logger.error("@@@InterruptedException 익셉션 @@@");
 		e.printStackTrace();
-		Main.run();
 	}
 
 	public ExceptionHandler(FirebaseMessagingException e) {
 		logger.error("@@@FirebaseMessagingException 익셉션 @@@");
 		e.printStackTrace();
-		Main.run();
 	}
 
 	public ExceptionHandler(IOException e) {
 		logger.error("@@@FirebaseMessagingException 익셉션 @@@");
 		e.printStackTrace();
-		Main.run();	
 	}
 }
