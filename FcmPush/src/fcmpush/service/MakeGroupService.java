@@ -1,6 +1,7 @@
 package fcmpush.service;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -31,59 +32,83 @@ public class MakeGroupService {
 	
 	private void init() {
 		
-		if(fireMessaing ==null) {
+		if(fireMessaing == null) {
 			try {
 				fireMessaing = FirebaseMessaging.getInstance(fireBaseConfig.initFireBaseApp());
 			} catch (IOException e) {
 				logger.error("ADC 인증 오류");
 			}
 		}
+
 	}
 	
+	// todo 트랜잭션 처리 해야함
 	public void makeReceiveUserGroup() throws IOException, FirebaseMessagingException {
-    	
-		// todo push_group 삭제
+		
 		
 		// List<String> tokens = repository.selectUsersToken();
 		List<String> tokens = new LinkedList<String>();
-		
 		for(int i=0; i < 10000; i++) {
-			 tokens.add("f_OoEVscSkCshbtP5cOFhh:APA91bH04xQltAKlGxcWcoQ_StyUkwXxbwenb4-fRViof424Vm5X5VXKGer7gGgxsbXRslkSZzC_hdPyoTYQu92SwtdKJ_Wknn1UgnjJhM0YxTlTp5q4VR3iMLUmwAuLrldHUc5xhU9a");
-			 tokens.add("dmDjI3yUS929jlJz1r3egf:APA91bFPsDWCS2UAAHGjynz8wpk3gii2ejWoSUs6iY19TnH818DpKrQpf3PJldWwc3D9ZrrpVt4C2t2K2R9ulDauwteSaMjzyMBZY3xtYudTAKSFM8-cPR8gOCwaSGfx4bOn4ldwrArj");
-			 tokens.add("d4ezIS3MQ2-ah0A2axdLa0:APA91bGHsL5LuPexm-OHsWG9UT1mQfm1i6cdGVArns0R-NFxCLRL4oqholKP6Jtu_BRvbVX4oYKNrDP6_n9JNv9LmQhN2DkWPXUzM2jTF6ACymFp3Nd8Fh9DvOuXIp1q1TgQY69cLXbI");
-			 
+			 tokens.add("f_OoEVscSkCshbtP5cOFhh:APA91bH04xQltAKlGxcWcoQ_StyUkwXxbwenb4-fRViof424Vm5X5VXKGer7gGgxsbXRslkSZzC_hdPyoTYQu92SwtdKJ_Wknn1UgnjJhM0YxTlTp5q4VR3iMLUmwAuLrldHUc5xhU9a");			 
 		}
-		long currentTime = System.currentTimeMillis();
+		
+		
+		deleteAllPushGroups();
+		// unSubscribeUserGroup(tokens);
+		
 
+		long currentTime = System.currentTimeMillis();
 		int groupSeq = 1;
     	
-    	for(int i = 0; i < 10000; i += groupSize) {
+    	for(int i = 0; i < tokens.size(); i += groupSize) {
     		logger.info(groupSeq + "번째 그룹 생성");
-    		
     		List<String> newTokens = new LinkedList<String>();
 
     		//마지막 그룹 만들때
     		if(i + groupSize > tokens.size()) {
     			newTokens = tokens.subList(i, tokens.size());
     		} 
-    		
     		else {
         		newTokens = tokens.subList(i, i+groupSize);
     		}
     		    	
 			TopicManagementResponse response = fireMessaing.subscribeToTopic(newTokens, FireBasePushEnum.GROUP_NAME.getValue() + groupSeq);
+
+    		HashMap<String, Object> map = new HashMap<String, Object>();
+    		map.put("GROUP_SEQ", groupSeq);
+    		map.put("GROUP_ID", FireBasePushEnum.GROUP_NAME.getValue() + groupSeq);
+    		map.put("REG_SUCCESS_CNT", response.getSuccessCount());
+    		map.put("REG_FAIL_CNT", response.getFailureCount());
     		
-			logger.info("토큰 등록 성공수:"+ response.getSuccessCount());
-    		logger.info("토큰 등록 실패수:"+ response.getFailureCount());
+    		insertPushGroup(map);
     		
-    		groupSeq += 1;logger.info(response.getErrors().toString() + " tokens were subscribed Fail");  
-    		
-    		//todo 
-    		//tb_push_group , tb_push_group_hist insert 
-    		
+    		groupSeq += 1;
     	}
     	
 		long afterTime = System.currentTimeMillis();
 		logger.info((afterTime - currentTime) / 1000);
     }
+	
+	
+	//  todo 구독취소..? 꼭해야하나? 수신그룹을 만들면 덮어씌워지긴하는데.. 
+	//	private void unSubscribeUserGroup(List<String> tokens) throws FirebaseMessagingException { 
+	//		
+	//		logger.info("unSubscribeUserGroup Call");
+	//		int groupSeq  = (int) Math.ceil(((double)tokens.size()) / groupSize);
+	//			
+	//    	for(int i = 0; i < groupSeq; i ++) {
+	//    		TopicManagementResponse response = fireMessaing.getInstance().
+	//    		logger.info("구독취소 요청 성공수"+response.getSuccessCount());
+	//    		logger.info("구독취소 요청 실패수"+response.getFailureCount());
+	//    	}
+	//	}
+	
+	
+	private int deleteAllPushGroups() { 	
+		return repository.deleteAllPushGroups();				
+	}
+	
+	private void insertPushGroup(HashMap<String, Object> param) { 
+		 repository.insertPushGroup(param);		
+	}
 }

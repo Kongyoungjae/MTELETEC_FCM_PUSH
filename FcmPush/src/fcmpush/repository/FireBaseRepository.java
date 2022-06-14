@@ -99,6 +99,50 @@ public class FireBaseRepository {
 		return tokens;
 	}
 	
+	public Integer deleteAllPushGroups() {
+		String query = "deleteAllPushGroups";
+		int deleteYn = 0;
+		
+		SqlSession session = dbconfig.getAdminSession();
+
+		if( session == null ) {
+			logger.info("sqlSession is null. not running query.");
+			return null;
+		}
+		try {
+			deleteYn = session.delete("deleteAllPushGroups");
+		} catch ( Exception e ) {
+			logger.error("exception/ SMSdao::selectOne()"+StackTraceLogUtil.getStackTraceString(e));
+		} finally {
+			session.commit();
+			session.close();
+		}
+		
+		return deleteYn;
+	}
+
+	public void insertPushGroup(HashMap<String, Object> param) {
+		
+		String query = "insertPushGroup";
+		
+		SqlSession session = dbconfig.getAdminSession();
+
+		if( session == null ) {
+			logger.info("sqlSession is null. not running query.");
+		}
+		try {
+			session.insert("insertPushGroup",param);
+
+		} catch ( Exception e ) {
+			session.rollback();
+			logger.error("exception/ SMSdao::selectOne()"+StackTraceLogUtil.getStackTraceString(e));
+		} finally {
+			session.commit();
+			session.close();
+		}
+
+	}
+	
 	
 
 	

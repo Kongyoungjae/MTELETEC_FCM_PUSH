@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import org.apache.ibatis.ognl.ASTThisVarRef;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -15,6 +16,7 @@ import fcmpush.repository.FireBaseRepository;
 public class FireBasePushService {
 	private static final Logger logger = LogManager.getLogger();
 
+	
 	private FireBaseConfig fireBaseConfig;
 	private FireBaseRepository repository;
 	
@@ -24,12 +26,15 @@ public class FireBasePushService {
 	}
 	
 	public void push(HashMap<String, Object> nowDateTime) {
-
+		
+		logger.info("push");
 		List<HashMap<String, Object>> pushList = repository.selectPushInfoByDateTime(nowDateTime);
+		logger.info(pushList.toString());
 		
 		//푸쉬 시간이면서 중복 발송이 아닌경우(DB에서 HISTORY 테이블에서 확인)
 		if(isPushTime(pushList) && notDuplicatePush(pushList)) {
 			
+			// push type 구분하고 발송
 			logger.info("푸쉬 시간이면서 중복 발송이 아닌경우");
 		}
 				

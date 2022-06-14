@@ -10,11 +10,9 @@
 
 	<!-- Appender, Layout 설정 -->
 	<Appenders>
-	
 		<Console name="console" target="SYSTEM_OUT">
 			<PatternLayout pattern="${layoutPattern}" />
 		</Console>
-		
 		<RollingFile name="file" fileName="${fName}" filePattern="${fPattern}" append="true">
 			
 			<PatternLayout pattern="${layoutPattern}" />
@@ -29,72 +27,20 @@
 			</DefaultRolloverStrategy>
 			
 		</RollingFile>
-		
 	</Appenders>
-	
-	<!-- Logger 설정 -->
-	<!-- LOC -->
-	<Loggers>
-		<Root level="info" additivity="false" >
-			<AppenderRef ref="console" />
-		</Root>
-		
-		<Logger name="db" level="DEBUG" additivity="false">
-			<AppenderRef ref="console" />
-		</Logger>
-		
-		<Logger name="info" level="DEBUG" additivity="false">
-			<AppenderRef ref="console" />
-		</Logger>
-		
-		<Logger name="main" level="DEBUG" additivity="false">
-			<AppenderRef ref="console" />
-		</Logger>
-		
-		<Logger name="socket" level="DEBUG" additivity="false">
-			<AppenderRef ref="console" />
-		</Logger>
-		
-		<Logger name="thread" level="DEBUG" additivity="false">
-			<AppenderRef ref="console" />
-		</Logger>
-		
-		<Logger name="util" level="DEBUG" additivity="false">
-			<AppenderRef ref="console" />
-		</Logger>
-	</Loggers>
-	
-	<!-- PRD -->
-	<!-- 
-	<Loggers>
-		<Root level="ERROR" additivity="false" >
-			<AppenderRef ref="console" />
-			<AppenderRef ref="file" />
-		</Root>
-		
-		<Logger name="db" level="DEBUG" additivity="false">
-			<AppenderRef ref="file" />
-		</Logger>
-		
-		<Logger name="info" level="DEBUG" additivity="false">
-			<AppenderRef ref="file" />
-		</Logger>
-		
-		<Logger name="main" level="DEBUG" additivity="false">
-			<AppenderRef ref="file" />
-		</Logger>
-		
-		<Logger name="socket" level="DEBUG" additivity="false">
-			<AppenderRef ref="file" />
-		</Logger>
-		
-		<Logger name="thread" level="DEBUG" additivity="false">
-			<AppenderRef ref="file" />
-		</Logger>
-		
-		<Logger name="util" level="DEBUG" additivity="false">
-			<AppenderRef ref="file" />
-		</Logger>
-	</Loggers>
-	-->
+
+<loggers>
+    
+  <root level="INFO">
+    <appender-ref ref="console" />
+  </root>
+	<logger name="log4jdbc.log4j2" level="info" additivity="false">
+      <MarkerFilter marker="LOG4JDBC_NON_STATEMENT" onMatch="DENY" onMismatch="NEUTRAL"/>
+      <MarkerFilter marker="LOG4JDBC_RESULTSET" onMatch="ACCEPT" onMismatch="DENY"/>
+      <MarkerFilter marker="LOG4JDBC_RESULTSETTABLE" onMatch="ACCEPT" onMismatch="DENY"/>
+      <appender-ref ref="console"/>
+    </logger>
+</loggers>
+
+
 </Configuration>

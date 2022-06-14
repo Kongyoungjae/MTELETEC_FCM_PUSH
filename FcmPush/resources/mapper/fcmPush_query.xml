@@ -10,7 +10,7 @@
         	PUSH_ID
           FROM TB_PUSH
         WHERE 
-        <![CDATA[ REL_DT < DATE_FORMAT(#{nowDateTime},'%Y-%m%-%d %H:%i:%s') ]]>
+        <![CDATA[ REL_DT = DATE_FORMAT(#{nowDateTime},'%Y-%m%-%d %H:%i:%s') ]]>
         	AND SEND_YN = 'Y'
     </select>
     
@@ -32,25 +32,30 @@
           FROM TB_USER
         ORDER BY REG_DT DESC
     </select>
+    
+    <insert id="insertPushGroup">
+    	INSERT INTO TB_PUSH_GROUP
+   		(
+    		GROUP_SEQ
+   		   ,GROUP_ID
+   		   ,REG_SUCCESS_CNT
+   		   ,REG_FAIL_CNT
+   		   ,REG_DT
+   		)
+   		VALUES 
+   		(
+   		    #{GROUP_SEQ}
+   		   ,#{GROUP_ID}
+   		   ,#{REG_SUCCESS_CNT}
+   		   ,#{REG_FAIL_CNT}
+   		   ,NOW()
+   		)
+    </insert>
 
-    <select id="selectSMS" parameterType="hashmap" resultType="hashmap">
-        select
-			 SENDER
-			,RECVER
-			,MSG
-        from
-			SMS_SEND_HIST
-		where
-			SEQ = #{seq}
-    </select>
-
-    <update id="updateSMS" parameterType="hashmap">
-    	update
-			SMS_SEND_HIST
-    	set
-			SEND_DT = SYSDATE()
-		where
-			SEQ = #{seq}
-    </update>
+    <delete id = "deleteAllPushGroups"> 
+    	DELETE 
+    	 FROM TB_PUSH_GROUP 
+    	WHERE 1=1
+    </delete>
 
 </mapper>
