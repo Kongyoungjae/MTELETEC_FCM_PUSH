@@ -18,6 +18,7 @@ public class ExceptionHandler extends RuntimeException {
 	public ExceptionHandler(RuntimeException e) {
 		logger.error("@@@RuntimeException 익셉션 @@@");
 		e.printStackTrace();
+		Main.run();
 	}
 
 	public ExceptionHandler(InterruptedException e) {

@@ -54,7 +54,7 @@ public class MakeGroupService {
 		
 		
 		deleteAllPushGroups();
-		unSubscribeUserGroup(tokens);
+		// unSubscribeUserGroup(tokens);
 		
 
 		long currentTime = System.currentTimeMillis();

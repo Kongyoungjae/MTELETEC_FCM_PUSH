@@ -32,7 +32,7 @@ public class FireBaseConfig  {
 		 return fireBaseApp; 
 	}
 	
-	// OAUTH_2
+	// OAUTH2
 	public String getAccessToken() throws IOException {
 
 		InputStream resource = this.getClass().getClassLoader().getResourceAsStream(FireBasePushEnum.KEY_PATH.getValue());

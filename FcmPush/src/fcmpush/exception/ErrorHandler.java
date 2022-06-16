@@ -13,8 +13,7 @@ public class ErrorHandler extends Error{
 	public ErrorHandler(Error e) {
 		logger.fatal("@@@에러핸들러@@@");
 		e.printStackTrace();
-		Main.run();
-		
+		Main.run();	
 	}
 
 }

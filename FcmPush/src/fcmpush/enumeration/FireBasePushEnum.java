@@ -10,6 +10,7 @@ public enum FireBasePushEnum {
 	,GROUP_NAME("UserGroup")
 	,GROUP_SIZE(1000);
 	
+	
 	private String value;
 	private int size;
 

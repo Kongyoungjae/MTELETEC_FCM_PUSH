@@ -25,6 +25,8 @@ public class Main {
 	public static void run () {
 		
 		try {
+			Thread.sleep(1000);		
+
 			// 수신그룹 만들기 스레드
 			Timer receiveGroupTimer = new Timer();
 			TimerTask makeReceiveGroupTask = new TimerTask() {			
@@ -49,7 +51,6 @@ public class Main {
 //			};
 //			pushTimer.scheduleAtFixedRate(pushTask, 0, 1000);
 //			
-			Thread.sleep(1000);		
 
 		}
 		

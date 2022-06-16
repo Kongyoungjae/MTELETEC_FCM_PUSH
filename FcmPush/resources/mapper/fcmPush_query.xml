@@ -30,7 +30,7 @@
         SELECT 
         	FCM_TOKEN
           FROM TB_USER
-        ORDER BY REG_DT DESC
+        ORDER BY REG_DT ASC
     </select>
     
     <insert id="insertPushGroup">
