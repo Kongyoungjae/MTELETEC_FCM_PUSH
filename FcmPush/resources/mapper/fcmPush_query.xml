@@ -4,11 +4,10 @@
 
 <mapper namespace="admin">
     
-    <select id="selectPushInfoByDateTime" resultType="hashmap" >
-       
+    <select id="selectPushInfoByDateTime" resultType="hashmap" >      
        SELECT 
         	PUSH_ID
-          FROM TB_PUSH
+         FROM TB_PUSH
         WHERE 
         <![CDATA[ REL_DT = DATE_FORMAT(#{nowDateTime},'%Y-%m%-%d %H:%i:%s') ]]>
         	AND SEND_YN = 'Y'
@@ -16,9 +15,9 @@
     
     <select id="selectPushHistByPushID" resultType="hashmap" >   
     	SELECT 
-    		T1.PUSH_ID
+    		T1.SEQ
 		 FROM TB_PUSH_HIST T1
-		INNER JOIN TB_PUSH T2 ON T1.PUSH_ID = T2.PUSH_ID
+		 JOIN TB_PUSH T2 ON T1.PUSH_ID = T2.PUSH_ID
 		WHERE T1.PUSH_ID = #{PUSH_ID}
 		 AND SENT = 'Y'
     </select>

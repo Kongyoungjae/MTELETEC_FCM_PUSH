@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Configuration>
-	
+
 	<Properties>
 		<Property name="fPath">/logs/spamansim</Property>
 		<Property name="fName">${fPath}/spamansim.log</Property>
-		<Property name="fPattern">${fPath}/spamansim_%d{yyyy-MM-dd-HH}.log</Property>
+		<Property name="fPattern">${fPath}/spamansim_%d{yyyy-MM-dd-HH}.log
+		</Property>
 		<Property name="layoutPattern">[%t] %d %-5p %c.%M:%L - %m%n</Property>
 	</Properties>
 
@@ -13,11 +14,13 @@
 		<Console name="console" target="SYSTEM_OUT">
 			<PatternLayout pattern="${layoutPattern}" />
 		</Console>
-		<RollingFile name="file" fileName="${fName}" filePattern="${fPattern}" append="true">
-			
+		<RollingFile name="file" fileName="${fName}"
+			filePattern="${fPattern}" append="true">
+
 			<PatternLayout pattern="${layoutPattern}" />
 			<Policies>
-				<TimeBasedTriggeringPolicy interval="1" modulate="true"/>
+				<TimeBasedTriggeringPolicy interval="1"
+					modulate="true" />
 			</Policies>
 			<DefaultRolloverStrategy>
 				<Delete basePath="${fPath}/" maxDepth="1">
@@ -25,27 +28,39 @@
 					<IfLastModified age="14d" />
 				</Delete>
 			</DefaultRolloverStrategy>
-			
+
 		</RollingFile>
 	</Appenders>
 
-<loggers>
-    
-  <root level="INFO">
-    <appender-ref ref="console" />
-  </root>
-	<logger name="log4jdbc.log4j2" level="info" additivity="false">
-      <MarkerFilter marker="LOG4JDBC_NON_STATEMENT" onMatch="DENY" onMismatch="NEUTRAL"/>
-      <MarkerFilter marker="LOG4JDBC_RESULTSET" onMatch="ACCEPT" onMismatch="DENY"/>
-      <MarkerFilter marker="LOG4JDBC_RESULTSETTABLE" onMatch="ACCEPT" onMismatch="DENY"/>
-      <appender-ref ref="console"/>
-    </logger>
+	<loggers>
 
-    
-    
-    <!--       <MarkerFilter marker="LOG4JDBC_RESULTSET" onMatch="DENY" onMismatch="NEUTRAL"/> -->
-<!--       <MarkerFilter marker="LOG4JDBC_RESULTSETTABLE" onMatch="DENY" onMismatch="NEUTRAL"/> -->
-</loggers>
+		<root level="INFO">
+			<appender-ref ref="console" />
+		</root>
+        <logger name="log4jdbc.log4j2" level="error" additivity="false">
+            <appender-ref ref="console" />
+        </logger>
+        
+        <!-- QUERY LOG -->
+        <logger name="jdbc.sqlonly" additivity="false" level="INFO">
+            <appender-ref ref="console" />
+        </logger>
 
+		<!-- RESULTSET TABLE -->
+        <logger name="jdbc.resultsettable" additivity="false" level="INFO">
+            <appender-ref ref="console" />
+        </logger>
 
+ 		<!-- query + time -->
+        <logger name="jdbc.sqltiming" level="off"/>
+        
+         <!-- 전체 로그 ( 양 상당히 많아짐 ) -->
+        <logger name="jdbc.audit" level="off"/>
+        
+         <!-- resultsettable + resultset (parameter) -->
+        <logger name="jdbc.resultset" level="off"/>
+        
+        <!-- connection log -->
+        <logger name="jdbc.connection" level="off"/>
+	</loggers>
 </Configuration>
