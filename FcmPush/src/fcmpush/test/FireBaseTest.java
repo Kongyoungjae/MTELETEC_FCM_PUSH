@@ -32,7 +32,7 @@ public class FireBaseTest  {
 	private final Logger logger = LogManager.getLogger();
 	public void runPushMessage() throws IOException {
 		
-		logger.info("LOG info");
+		logger.info("LOG warn");
 		logger.warn("LOG warn");
 		logger.debug("LOG debug");
 		logger.error("LOG error");
