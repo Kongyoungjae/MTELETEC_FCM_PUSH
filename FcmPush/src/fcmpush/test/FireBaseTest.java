@@ -43,6 +43,14 @@ public class FireBaseTest  {
 
 	}
 	
+	public void test() throws IOException {
+		logger.info("LOG info");
+	}
+	
+	public void test2() throws IOException {
+		logger.info("LOG info");
+	}
+	
 	
 	//ADC 인증
 //	private FirebaseApp initFireBaseApp() throws IOException {
