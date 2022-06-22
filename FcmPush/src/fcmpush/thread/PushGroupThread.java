@@ -9,15 +9,15 @@ import com.google.firebase.messaging.FirebaseMessagingException;
 
 import fcmpush.exception.ErrorHandler;
 import fcmpush.exception.ExceptionHandler;
-import fcmpush.service.MakeGroupService;
+import fcmpush.service.PushGroupService;
 
-public class MakeGroupThread {
+public class PushGroupThread {
 	private static final Logger logger = LogManager.getLogger();
 	
 	public void run() {		
 		
 		try {
-			MakeGroupService service = new MakeGroupService();
+			PushGroupService service = new PushGroupService();
 			service.makeReceiveUserGroup();
 		} catch (Error e) {
 			throw new ErrorHandler(e);

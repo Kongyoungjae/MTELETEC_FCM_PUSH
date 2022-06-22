@@ -1,5 +1,6 @@
 package fcmpush.enumeration;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @Getter

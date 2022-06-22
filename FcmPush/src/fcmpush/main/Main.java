@@ -10,7 +10,7 @@ import fcmpush.enumeration.FireBaseIntervalEnum;
 import fcmpush.exception.ErrorHandler;
 import fcmpush.exception.ExceptionHandler;
 import fcmpush.thread.FireBasePushThread;
-import fcmpush.thread.MakeGroupThread;
+import fcmpush.thread.PushGroupThread;
 import fcmpush.util.DateUtil;
 
 public class Main {
@@ -35,8 +35,7 @@ public class Main {
 //					groupThread.run();
 //				}			
 //			};
-//			DateUtil dateUtil = new DateUtil();			
-//			receiveGroupTimer.scheduleAtFedRate(makeReceiveGroupTask, dateUtil.todayFourAm() , FireBaseIntervalEnum.All_GROUP_CREATE_INTERVAL.getInterval());
+//			receiveGroupTimer.scheduleAtFixedRate(makeReceiveGroupTask, DateUtil.todayFourAm().getTime() , FireBaseIntervalEnum.All_GROUP_CREATE_INTERVAL.getInterval());
 			
 			//푸쉬 스레드
 			Timer pushTimer = new Timer();

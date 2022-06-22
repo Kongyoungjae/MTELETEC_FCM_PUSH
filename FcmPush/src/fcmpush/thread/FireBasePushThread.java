@@ -15,7 +15,7 @@ public class FireBasePushThread {
 
 		try {
 			HashMap<String, Object> map = new HashMap<String, Object>();
-			map.put("nowDateTime", DateUtil.getDateTime());
+			map.put("nowDateTime", DateUtil.getNowHourMinuate());
 					
 			FireBasePushService service = new FireBasePushService();
 			service.push(map);				

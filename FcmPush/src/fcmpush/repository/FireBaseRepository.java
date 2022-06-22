@@ -4,34 +4,28 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import fcmpush.config.DataBaseConfig;
-import fcmpush.service.FireBasePushService;
-import fcmpush.util.DateUtil;
 import fcmpush.util.StackTraceLogUtil;
 
 public class FireBaseRepository {
 
-	private static final Logger logger = LogManager.getLogger(FireBasePushService.class);
+	private static final Logger logger = LogManager.getLogger(FireBaseRepository.class);
 	private DataBaseConfig dbconfig;
 
 	public FireBaseRepository() {
 		dbconfig = new DataBaseConfig();
 	}
 	
-	// select. result. single
-	public List<HashMap<String, Object>> selectPushInfoByDateTime(HashMap<String, Object> nowDateTime) {
-		final String query = "selectPushInfoByDateTime";
+	// 현재시간 = 푸쉬예정시간 
+	public List<HashMap<String, Object>> selectTodayPushInfoByNowDateTime(HashMap<String, Object> nowDateTime) {
+		final String query = "selectTodayPushInfoByNowDateTime";
 		
 		List<HashMap<String, Object>> resultMap = new ArrayList<HashMap<String,Object>>();
 			
-		HashMap<String, Object> paramMap = new HashMap<String, Object>();
-		paramMap.put("nowDateTime", DateUtil.getDateTime());
-		
 		SqlSession s = dbconfig.getAdminSession();
 		if( s == null ) {
 			logger.info("sqlSession is null. not running query.");
@@ -39,7 +33,7 @@ public class FireBaseRepository {
 		}
 		
 		try {
-			resultMap = s.selectList(query, paramMap);
+			resultMap = s.selectList(query, nowDateTime);
 		} catch ( Exception e ) {
 			logger.error("exception/ SMSdao::selectOne()"+StackTraceLogUtil.getStackTraceString(e));
 		} finally {
@@ -49,37 +43,54 @@ public class FireBaseRepository {
 		return resultMap;
 	}
 	
-	public List<HashMap<String, Object>> selectPushHistByPushID(HashMap<String, Object> pushID) {
-		final String query = "selectPushHistByPushID";
-		
-		List<HashMap<String, Object>> resultMap = new ArrayList<HashMap<String,Object>>();
-		
-		
-		HashMap<String, Object> paramMap = new HashMap<String, Object>();
-		paramMap.put("PUSH_ID", pushID.get("PUSH_ID"));	
-		
-		
+	// 오늘 발송한 푸쉬가 있는지 확인 
+	public int selectTodayPushHistCount() {
+		final String query = "selectTodayPushHistCount";
+		int count = 0;
+			
 		SqlSession s = dbconfig.getAdminSession();
 		if( s == null ) {
 			logger.info("sqlSession is null. not running query.");
-			return null;
+			throw new NullPointerException();
 		}
 		
 		try {
-			resultMap = s.selectList(query, paramMap);
+			count = s.selectOne(query);
 		} catch ( Exception e ) {
 			logger.error("exception/ SMSdao::selectOne()"+StackTraceLogUtil.getStackTraceString(e));
 		} finally {
 			s.close();
 		}
 		
-		return resultMap;		
+		return count;
+	}
+	
+	// 푸쉬 발송 내역 확인
+	public int selectPushHistCountByPushID(HashMap<String, Object> pushID) {
+		final String query = "selectPushHistCountByPushID";
+		int result = 0;
+		
+		SqlSession s = dbconfig.getAdminSession();
+		if( s == null ) {
+			logger.info("sqlSession is null. not running query.");
+			throw new NullPointerException();
+		}
+		
+		try {
+			result = s.selectOne(query, pushID);
+		} catch ( Exception e ) {
+			logger.error("exception/ SMSdao::selectOne()"+StackTraceLogUtil.getStackTraceString(e));
+		} finally {
+			s.close();
+		}
+		
+		return result;		
 	}
 	
 	
-	// select. result. single
-	public List<String> selectUsersToken() {
-		String query = "selectUsersToken";
+	// 오전 4시이전 가입한 토큰 가져오기
+	public List<String> selectUsersTokenBefore4AM() {
+		String query = "selectUsersTokenBefore4AM";
 		List<String> tokens = new ArrayList<String>();
 		
 		SqlSession session = dbconfig.getServiceSession();
@@ -99,18 +110,64 @@ public class FireBaseRepository {
 		return tokens;
 	}
 	
-	public Integer deleteAllPushGroups() {
-		String query = "deleteAllPushGroups";
-		int deleteYn = 0;
+	// 오전4시 이후 가입한 토큰 가져오기
+	public List<String> selectUsersTokenAfter4AM() {
+		String query = "selectUsersTokenAfter4AM";
+		List<String> tokens = new ArrayList<String>();
 		
-		SqlSession session = dbconfig.getAdminSession();
+		SqlSession session = dbconfig.getServiceSession();
 
 		if( session == null ) {
 			logger.info("sqlSession is null. not running query.");
 			return null;
 		}
 		try {
-			deleteYn = session.delete("deleteAllPushGroups");
+			tokens = session.selectList(query);
+		} catch ( Exception e ) {
+			logger.error("exception/ SMSdao::selectOne()"+StackTraceLogUtil.getStackTraceString(e));
+		} finally {
+			session.close();
+		}
+		
+		return tokens;
+	}
+	
+	public int selectMaxGroupSEQ() {
+		final String query = "selectMaxGroupSEQ";
+		int count = 0;
+			
+		SqlSession s = dbconfig.getAdminSession();
+		if( s == null ) {
+			logger.info("sqlSession is null. not running query.");
+			throw new NullPointerException();
+		}
+		
+		try {
+			count = s.selectOne(query);
+		} catch ( Exception e ) {
+			logger.error("exception/ SMSdao::selectOne()"+StackTraceLogUtil.getStackTraceString(e));
+		} finally {
+			s.close();
+		}
+		
+		return count;
+	}
+	
+	
+	
+	// 모든 푸쉬 그룹 삭제
+	public int deleteAllReceiveGroups() {
+		String query = "deleteAllReceiveGroups";
+		int deleteYn = 0;
+		
+		SqlSession session = dbconfig.getAdminSession();
+
+		if( session == null ) {
+			logger.info("sqlSession is null. not running query.");
+			throw new NullPointerException();
+		}
+		try {
+			deleteYn = session.delete("deleteAllReceiveGroups");
 		} catch ( Exception e ) {
 			logger.error("exception/ SMSdao::selectOne()"+StackTraceLogUtil.getStackTraceString(e));
 		} finally {
@@ -121,6 +178,7 @@ public class FireBaseRepository {
 		return deleteYn;
 	}
 
+	// 푸쉬그룹 DB INSERT
 	public void insertPushGroup(HashMap<String, Object> param) {
 		
 		String query = "insertPushGroup";
@@ -140,148 +198,8 @@ public class FireBaseRepository {
 			session.commit();
 			session.close();
 		}
-
 	}
-	
-	
 
-	
-	
-	
-	
-	
-	
-	
-	
-//	// insert. single 아마 여기서는 사용할일 없을것.
-//	public Integer insert(String query, Map<String,String> param) {
-//		Integer nResult = 0;
-//		
-//		SqlSession s = DataBaseConfig.getServiceSession();
-//		if( s == null ) {
-//			logger.info("sqlSession is null. not running query.");
-//			return null;
-//		}
-//		
-//		try {
-//			nResult = s.insert(query,param);
-//		} catch ( Exception e ) {
-//			logger.error("exception/ SMSdao::insert() single param /"+StackTraceLogUtil.getStackTraceString(e));
-//		} finally {
-//			s.close();
-//		}
-//		
-//		return nResult;
-//	}
-//	
-//	// insert. list 아마 여기서는 사용할일 없을것.
-//	public Integer insert(String query, List<Map<String,String>> param) {
-//		Integer nResult = 0;
-//		
-//		SqlSession s = DataBaseConfig.getServiceSession();
-//		if( s == null ) {
-//			logger.info("sqlSession is null. not running query.");
-//			return null;
-//		}
-//		
-//		try {
-//			for( Map<String,String> m : param ) {
-//				nResult += s.insert(query,m);
-//			}
-//		} catch ( Exception e ) {
-//			logger.error("exception/ SMSdao::insert() list param /"+StackTraceLogUtil.getStackTraceString(e));
-//		} finally {
-//			s.close();
-//		}
-//		
-//		return nResult;
-//	}
-//	
-//	// update. single.
-//	public Integer update(String query, Map<String,String> param) {
-//		Integer nResult = 0;
-//		
-//		SqlSession s = DataBaseConfig.getServiceSession();
-//		if( s == null ) {
-//			logger.info("sqlSession is null. not running query.");
-//			return null;
-//		}
-//		
-//		try {
-//			nResult = s.update(query,param);
-//		} catch ( Exception e ) {
-//			logger.error("exception/ SMSdao::update() single param /"+StackTraceLogUtil.getStackTraceString(e));
-//		} finally {
-//			s.close();
-//		}
-//		
-//		return nResult;
-//	}
-//	
-//	// update. list
-//	public Integer update(String query, List<Map<String,String>> param) {
-//		Integer nResult = 0;
-//		
-//		SqlSession s = DataBaseConfig.getServiceSession();
-//		if( s == null ) {
-//			logger.info("sqlSession is null. not running query.");
-//			return null;
-//		}
-//		
-//		try {
-//			for( Map<String,String> m : param ) {
-//				nResult += s.update(query,m);
-//			}
-//		} catch ( Exception e ) {
-//			logger.error("exception/ SMSdao::update() list param /"+StackTraceLogUtil.getStackTraceString(e));
-//		} finally {
-//			s.close();
-//		}
-//		
-//		return nResult;
-//	}
-//	
-//	// delete. single.
-//	public Integer delete(String query, Map<String,String> param) {
-//		Integer nResult = 0;
-//		
-//		SqlSession s = DataBaseConfig.getServiceSession();
-//		if( s == null ) {
-//			logger.info("sqlSession is null. not running query.");
-//			return null;
-//		}
-//		
-//		try {
-//			nResult = s.delete(query,param);
-//		} catch ( Exception e ) {
-//			logger.error("exception/ SMSdao::delete() single param /"+StackTraceLogUtil.getStackTraceString(e));
-//		} finally {
-//			s.close();
-//		}
-//		
-//		return nResult;
-//	}
-//	
-//	// delete. list.
-//	public Integer delete(String query, List<Map<String,String>> param) {
-//		Integer nResult = 0;
-//		
-//		SqlSession s = DataBaseConfig.getServiceSession();
-//		if( s == null ) {
-//			logger.info("sqlSession is null. not running query.");
-//			return null;
-//		}
-//		
-//		try {
-//			for( Map<String,String> m : param ) {
-//				nResult += s.delete(query,m);
-//			}
-//		} catch ( Exception e ) {
-//			logger.error("exception/ SMSdao::delete() list param /"+StackTraceLogUtil.getStackTraceString(e));
-//		} finally {
-//			s.close();
-//		}
-//		
-//		return nResult;
-//	}
+
+
 }

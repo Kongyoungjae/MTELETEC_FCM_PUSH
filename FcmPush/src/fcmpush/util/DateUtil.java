@@ -7,7 +7,7 @@ import java.util.Date;
 
 public class DateUtil {
 
-	public Date todayFourAm() {	
+	public static Date todayFourAm() {	
 		LocalDateTime nowDateTime = LocalDateTime.now();
 		LocalDateTime startTime = LocalDateTime.of(
 				  nowDateTime.getYear()
@@ -22,7 +22,24 @@ public class DateUtil {
 		return date; 
 	}
 	
-	public static String getDateTime() {	
+	public static String getNowHourMinuate() {	
+		LocalDateTime nowDateTime = LocalDateTime.now();
+		LocalDateTime startTime = LocalDateTime.of(
+				  nowDateTime.getYear()
+				, nowDateTime.getMonth()
+				, nowDateTime.getDayOfMonth()
+				, nowDateTime.getHour()
+				, nowDateTime.getMinute()
+				, 0);
+		
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMddHHmm00");
+		
+		startTime.format(formatter);
+	 
+		return startTime.format(formatter); 
+	}
+	
+	public static String todayNoonThisMorning() {	
 		LocalDateTime nowDateTime = LocalDateTime.now();
 		LocalDateTime startTime = LocalDateTime.of(
 				  nowDateTime.getYear()

@@ -4,33 +4,74 @@
 
 <mapper namespace="admin">
     
-    <select id="selectPushInfoByDateTime" resultType="hashmap" >      
+    <select id="selectTodayPushInfoByNowDateTime" parameterType="map" resultType="hashmap" >      
        SELECT 
         	PUSH_ID
          FROM TB_PUSH
         WHERE 
-        <![CDATA[ REL_DT = DATE_FORMAT(#{nowDateTime},'%Y-%m%-%d %H:%i:%s') ]]>
+        <![CDATA[ 
+        	REL_DT = DATE_FORMAT(#{nowDateTime},'%Y-%m%-%d %H:%i:%s') 
         	AND SEND_YN = 'Y'
+        ]]>
+        	
     </select>
     
-    <select id="selectPushHistByPushID" resultType="hashmap" >   
+    <select id="selectPushHistCountByPushID" parameterType="map" resultType="int" >   
     	SELECT 
-    		T1.SEQ
-		 FROM TB_PUSH_HIST T1
-		 JOIN TB_PUSH T2 ON T1.PUSH_ID = T2.PUSH_ID
+    		COUNT(T1.SEQ)
+		FROM TB_PUSH_HIST T1
+		JOIN TB_PUSH T2 ON T1.PUSH_ID = T2.PUSH_ID
 		WHERE T1.PUSH_ID = #{PUSH_ID}
-		 AND SENT = 'Y'
+	      AND SENT = 'Y'
+    </select>
+    
+    <select id="selectUsersTokenBefore4AM" parameterType="map" resultType="String" >
+        SELECT 
+        	FCM_TOKEN
+        FROM TB_USER
+        WHERE
+        <![CDATA[
+        	REG_DT <= DATE_FORMAT(NOW(),'%Y-%m%-%d 03:59:59')
+        ]]>
+        ORDER BY REG_DT ASC
+    </select>
+    
+    <select id="selectUsersTokenAfter4AM" parameterType="map" resultType="String" >
+        SELECT 
+        	FCM_TOKEN
+        FROM TB_USER
+        WHERE
+        <![CDATA[
+        	REG_DT >= DATE_FORMAT(NOW(),'%Y-%m%-%d 04:00:00')
+        ]]>
+        ORDER BY REG_DT ASC
+    </select>     
+    
+    <select id="selectTodayPushHistCount" parameterType="map" resultType="int" >   
+		SELECT COUNT(*)
+		  FROM TB_PUSH_HIST 
+		WHERE 
+		<![CDATA[ 
+			REL_DT >= DATE_FORMAT(NOW(),'%Y-%m-%d 00:00:00')
+		AND REL_DT <= DATE_FORMAT(NOW(),'%Y-%m-%d 23:59:59')
+		]]>
+    </select>
+    
+    <select id ="selectMaxGroupSEQ" resultType="int">
+    	SELECT MAX(GROUP_SEQ)
+    	  FROM TB_PUSH_GROUP
     </select>
     
     
 
+
     
-    <select id="selectUsersToken" resultType="String" >
-        SELECT 
-        	FCM_TOKEN
-          FROM TB_USER
-        ORDER BY REG_DT ASC
-    </select>
+    
+    
+    
+    
+    
+    
     
     <insert id="insertPushGroup">
     	INSERT INTO TB_PUSH_GROUP
@@ -51,7 +92,7 @@
    		)
     </insert>
 
-    <delete id = "deleteAllPushGroups"> 
+    <delete id = "deleteAllReceiveGroups"> 
     	DELETE 
     	 FROM TB_PUSH_GROUP 
     	WHERE 1=1

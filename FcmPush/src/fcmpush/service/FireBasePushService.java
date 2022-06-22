@@ -1,23 +1,18 @@
 package fcmpush.service;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Timer;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import com.google.firebase.FirebaseApp;
-import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.FirebaseMessagingException;
-import com.google.firebase.messaging.Message;
 
 import fcmpush.config.FireBaseConfig;
-import fcmpush.main.Main;
 import fcmpush.repository.FireBaseRepository;
+import fcmpush.target.PushTarget;
+import fcmpush.util.DateUtil;
 
 
 public class FireBasePushService {
@@ -32,18 +27,41 @@ public class FireBasePushService {
 	}
 	
 
-	public void push(HashMap<String, Object> nowDateTime) throws InterruptedException {
+	public void push(HashMap<String, Object> nowDateTime) throws InterruptedException, FirebaseMessagingException, IOException {
 		
-		List<HashMap<String, Object>> pushList = repository.selectPushInfoByDateTime(nowDateTime);
-
-		//푸쉬 시간이면서 중복발송이 아닌경우
+		List<HashMap<String, Object>> pushList = repository.selectTodayPushInfoByNowDateTime(nowDateTime);
+		
 		if(isPushTime(pushList) && notDuplicatePush(pushList)) {
-			if("all".equals(checkPushTarget(pushList))) {
+//		if(isPushTime(pushList)) {
+			logger.info("푸쉬 시간이면서 중복발송이 아닌경우");
+			
+			if(todayFristPush()) {
+				List<String> tokens = repository.selectUsersTokenAfter4AM();				
+				PushGroupService pushGroupService = new PushGroupService();
+				pushGroupService.makeReceiveUserGroupJoinedToday(tokens);
+			} 		
+			else {
+				//
 				
-			} 
+			}
+			
+			// PushTarget target = PushTargetFactory.getTarget(pushList);
+
+			
+			
+			/*
+			 * 오늘 첫 푸쉬인경우
+			 * ex ) 2022-06-21 00:00 ~ 2022-06-21 15:00(푸쉬시간) 까지 그룹핑
+			 *   -> 1) hist table 오늘일자 기준 count가 0이면 첫발송
+			 *        : 그룹핑해야지
+			 *        :
+			 *   -> 2) 오늘일자기준 가장가까운 푸쉬데이터가 처음이란 소리고
+			 * 
+			 */			
 		}		
 	}
 	
+	//현재시간 = DB 발송시간
 	private boolean isPushTime(List<HashMap<String, Object>> pushList) {	
 		if (pushList.size() != 0) {
 			return true;
@@ -55,12 +73,22 @@ public class FireBasePushService {
 	//같은 시간에 여러 PUSH건에 대해 한건이라도 HIST테이블에 데이터가 있으면 False
 	private boolean notDuplicatePush(List<HashMap<String, Object>> pushList) {
 		for(HashMap<String, Object> pushID: pushList) {		
-			List<HashMap<String,Object>> resultList = repository.selectPushHistByPushID(pushID);
-			if(resultList.size() != 0 ) {
+			int count = repository.selectPushHistCountByPushID(pushID);
+			if(count != 0 ) { 
+				logger.info("TB_PUSH_HIST에 푸쉬내역이 있음");
 				return false;
 			}
 		}
 		return true;
+	}
+	
+	//오늘 처음발송
+	private boolean todayFristPush() {
+		
+		if(0 == repository.selectTodayPushHistCount()) {
+			return true;
+		}
+		return false;
 	}
 	
 	
@@ -73,24 +101,30 @@ public class FireBasePushService {
 		// all
 		return "all";
 	}
-	
-	private void groupPushProcess() throws IOException, FirebaseMessagingException {
 
-//		Message message = Message.builder()
-//				.setTopic("allUsers")
-		
-		FirebaseMessaging fireMessaing = FirebaseMessaging.getInstance(fireBaseConfig.initFireBaseApp());
-		fireMessaing.send(null);
-	}
 	
-	private void singlePushProcess() throws IOException, FirebaseMessagingException {
-
-//		Message message = Message.builder()
-//				.setTopic("allUsers")
-		
-		FirebaseMessaging fireMessaing = FirebaseMessaging.getInstance(fireBaseConfig.initFireBaseApp());
-		fireMessaing.send(null);
-	}
+	
+	
+	
+	
+	
+//	private void groupPushProcess() throws IOException, FirebaseMessagingException {
+//
+////		Message message = Message.builder()
+////				.setTopic("allUsers")
+//		
+//		FirebaseMessaging fireMessaing = FirebaseMessaging.getInstance(fireBaseConfig.initFireBaseApp());
+//		fireMessaing.send(null);
+//	}
+//	
+//	private void singlePushProcess() throws IOException, FirebaseMessagingException {
+//
+////		Message message = Message.builder()
+////				.setTopic("allUsers")
+//		
+//		FirebaseMessaging fireMessaing = FirebaseMessaging.getInstance(fireBaseConfig.initFireBaseApp());
+//		fireMessaing.send(null);
+//	}
 
 	
 	
