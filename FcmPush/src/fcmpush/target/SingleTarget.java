@@ -3,7 +3,7 @@ package fcmpush.target;
 public class SingleTarget extends PushTarget {
 
 	@Override
-	void targetPush() {
+	public void targetPush() {
 		logger.info("targetPush 입니다");
 	}
 }

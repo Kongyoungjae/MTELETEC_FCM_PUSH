@@ -12,6 +12,7 @@ import com.google.firebase.messaging.FirebaseMessagingException;
 import fcmpush.config.FireBaseConfig;
 import fcmpush.repository.FireBaseRepository;
 import fcmpush.target.PushTarget;
+import fcmpush.target.PushTargetFactory;
 import fcmpush.util.DateUtil;
 
 
@@ -44,7 +45,11 @@ public class FireBasePushService {
 				List<String> tokens = repository.selectJoinUsersTokenAfterLastPushTime(lastPushTime);
 				pushGroupService.createReceiveUserGroupJoinedToday(tokens);
 			}
-			
+			PushTargetFactory factory = new PushTargetFactory();
+			PushTarget target = factory.createPushTarget(pushList);
+			target.targetPush();
+			//good
+	
 			
 //			// PushTarget target = PushTargetFactory.getTarget(pushList);		
 		}		
