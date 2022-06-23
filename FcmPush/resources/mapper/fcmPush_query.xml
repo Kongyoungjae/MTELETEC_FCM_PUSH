@@ -16,6 +16,7 @@
         	
     </select>
     
+    <!-- duplicate 관련 이름으로 바꾸면 좋을거같다 -->
     <select id="selectPushHistCountByPushID" parameterType="map" resultType="int" >   
     	SELECT 
     		COUNT(T1.SEQ)
@@ -45,7 +46,29 @@
         	REG_DT >= DATE_FORMAT(NOW(),'%Y-%m%-%d 04:00:00')
         ]]>
         ORDER BY REG_DT ASC
+    </select>
+
+    <select id="selectJoinUsersTokenAfterLastPushTime" parameterType="map" resultType="String" >
+        SELECT 
+        	FCM_TOKEN
+        FROM TB_USER
+        WHERE
+        <![CDATA[
+        	REG_DT >= DATE_FORMAT(#{REL_DT},'%Y-%m%-%d %H:%i:%s')
+        ]]>
+        ORDER BY REG_DT ASC
     </select>     
+    
+    <select id="selectPushHistLastPushTime" resultType="hashmap" >
+		SELECT
+			  SEQ 
+			 ,REL_DT
+			 ,MIN(NOW()- REL_DT) AS REL
+		FROM TB_PUSH_HIST
+		GROUP BY SEQ,REL_DT
+		ORDER BY REL ASC
+		LIMIT 1
+    </select>   
     
     <select id="selectTodayPushHistCount" parameterType="map" resultType="int" >   
 		SELECT COUNT(*)
@@ -57,21 +80,11 @@
 		]]>
     </select>
     
-    <select id ="selectMaxGroupSEQ" resultType="int">
-    	SELECT MAX(GROUP_SEQ)
+    <select id="selectMaxGroupSEQ" resultType="int">
+    	SELECT 
+    		IFNULL(MAX(GROUP_SEQ),0)
     	  FROM TB_PUSH_GROUP
     </select>
-    
-    
-
-
-    
-    
-    
-    
-    
-    
-    
     
     <insert id="insertPushGroup">
     	INSERT INTO TB_PUSH_GROUP
@@ -92,7 +105,7 @@
    		)
     </insert>
 
-    <delete id = "deleteAllReceiveGroups"> 
+    <delete id="deleteAllReceiveGroups"> 
     	DELETE 
     	 FROM TB_PUSH_GROUP 
     	WHERE 1=1

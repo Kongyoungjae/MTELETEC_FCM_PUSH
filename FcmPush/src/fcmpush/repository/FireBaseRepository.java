@@ -61,8 +61,27 @@ public class FireBaseRepository {
 		} finally {
 			s.close();
 		}
-		
 		return count;
+	}
+	
+	public HashMap<String, Object> selectPushHistLastPushTime() {
+		final String query = "selectPushHistLastPushTime";
+		HashMap<String, Object> resultMap = new HashMap<String, Object>();
+		
+		SqlSession s = dbconfig.getAdminSession();
+		if( s == null ) {
+			logger.info("sqlSession is null. not running query.");
+			throw new NullPointerException();
+		}
+		
+		try {
+			resultMap = s.selectOne(query);
+		} catch ( Exception e ) {
+			logger.error("exception/ SMSdao::selectOne()"+StackTraceLogUtil.getStackTraceString(e));
+		} finally {
+			s.close();
+		}
+		return resultMap;
 	}
 	
 	// 푸쉬 발송 내역 확인
@@ -129,6 +148,26 @@ public class FireBaseRepository {
 			session.close();
 		}
 		
+		return tokens;
+	}
+	// 마지막 발송후 가입한 유저들 토큰
+	public List<String> selectJoinUsersTokenAfterLastPushTime(HashMap<String, Object> lastPushTime) {
+		String query = "selectJoinUsersTokenAfterLastPushTime";
+		List<String> tokens = new ArrayList<String>();
+		
+		SqlSession session = dbconfig.getServiceSession();
+
+		if( session == null ) {
+			logger.info("sqlSession is null. not running query.");
+			return null;
+		}
+		try {
+			tokens = session.selectList(query , lastPushTime);
+		} catch ( Exception e ) {
+			logger.error("exception/ SMSdao::selectOne()"+StackTraceLogUtil.getStackTraceString(e));
+		} finally {
+			session.close();
+		}		
 		return tokens;
 	}
 	
@@ -199,6 +238,8 @@ public class FireBaseRepository {
 			session.close();
 		}
 	}
+
+
 
 
 

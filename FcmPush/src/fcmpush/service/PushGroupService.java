@@ -22,7 +22,7 @@ public class PushGroupService {
 	private FireBaseConfig fireBaseConfig;
 	private FireBaseRepository repository;
 	private static FirebaseMessaging fireMessaing;
-	private int groupSize = FireBasePushEnum.GROUP_SIZE.getSize();
+	private static final int GROUP_SIZE = FireBasePushEnum.GROUP_SIZE.getSize();
 
 	public PushGroupService() {
 		fireBaseConfig = new FireBaseConfig();
@@ -45,33 +45,30 @@ public class PushGroupService {
 	// todo 트랜잭션 처리 해야함
 	public void makeReceiveUserGroup() throws IOException, FirebaseMessagingException {
 		
+		
 		// 금일 4시 이전까지 가입한 토큰 가져오기
-		// List<String> tokens = repository.selectUsersTokenBefore4AM();
-		List<String> tokens = new LinkedList<String>();
-		for(int i=0; i < 10000; i++) {
-			 tokens.add("f_OoEVscSkCshbtP5cOFhh:APA91bH04xQltAKlGxcWcoQ_StyUkwXxbwenb4-fRViof424Vm5X5VXKGer7gGgxsbXRslkSZzC_hdPyoTYQu92SwtdKJ_Wknn1UgnjJhM0YxTlTp5q4VR3iMLUmwAuLrldHUc5xhU9a");			 
-		}
-		
-		
-		deleteAllReceiveGroups();
+		List<String> tokens = repository.selectUsersTokenBefore4AM();
+		// deleteAllReceiveGroups();
 		// unSubscribeUserGroup(tokens);
-		
-
 		long currentTime = System.currentTimeMillis();
 		int groupSeq = 1;
     	
-    	for(int i = 0; i < tokens.size(); i += groupSize) {
+    	for(int i = 0; i < tokens.size(); i += GROUP_SIZE) {
     		logger.info(groupSeq + "번째 그룹 생성");
     		List<String> newTokens = new LinkedList<String>();
 
     		//마지막 그룹 만들때
-    		if(i + groupSize > tokens.size()) {
+    		if(i + GROUP_SIZE > tokens.size()) {
     			newTokens = tokens.subList(i, tokens.size());
     		} 
     		else {
-        		newTokens = tokens.subList(i, i+groupSize);
+        		newTokens = tokens.subList(i, i+GROUP_SIZE);
     		}
     		    	
+    		// 템플릿 메서드 패턴???
+    		// 구독하는건 똑같다
+    		// 메서드로 뺴자 걍
+    		// okok 
 			TopicManagementResponse response = fireMessaing.subscribeToTopic(newTokens, FireBasePushEnum.GROUP_NAME.getValue() + groupSeq);
 
     		HashMap<String, Object> map = new HashMap<String, Object>();
@@ -91,29 +88,24 @@ public class PushGroupService {
 	
 	
 	//금일 4시 이후 가입한 사람들 그룹핑
-	public void makeReceiveUserGroupJoinedToday(List<String> tokens) throws IOException, FirebaseMessagingException {
-		
-		for(int i=0; i < 100; i++) {
-			 tokens.add("f_OoEVscSkCshbtP5cOFhh:APA91bH04xQltAKlGxcWcoQ_StyUkwXxbwenb4-fRViof424Vm5X5VXKGer7gGgxsbXRslkSZzC_hdPyoTYQu92SwtdKJ_Wknn1UgnjJhM0YxTlTp5q4VR3iMLUmwAuLrldHUc5xhU9a");			 
-		}
+	public void createReceiveUserGroupJoinedToday(List<String> tokens) throws IOException, FirebaseMessagingException {
 		
 		int groupSeq = repository.selectMaxGroupSEQ();
 		
-    	for(int i = 0; i < tokens.size(); i += groupSize) {
+		// 1000개인데
+    	for(int i = 0; i < tokens.size(); i += GROUP_SIZE) {
 
     		List<String> newTokens = new LinkedList<String>();
 
     		//마지막 그룹 만들때
-    		if(i + groupSize > tokens.size()) {
+    		if(i + GROUP_SIZE > tokens.size()) {
     			newTokens = tokens.subList(i, tokens.size());
     		} 
     		else {
-        		newTokens = tokens.subList(i, i+groupSize);
+        		newTokens = tokens.subList(i, i+GROUP_SIZE);
     		}
     		    	
-			
 			TopicManagementResponse response = fireMessaing.subscribeToTopic(newTokens, FireBasePushEnum.GROUP_NAME.getValue() + groupSeq);
-
     		HashMap<String, Object> map = new HashMap<String, Object>();
     		map.put("GROUP_SEQ", groupSeq);
     		map.put("GROUP_ID", FireBasePushEnum.GROUP_NAME.getValue() + groupSeq);
@@ -132,7 +124,7 @@ public class PushGroupService {
 //	private void unSubscribeUserGroup(List<String> tokens) throws FirebaseMessagingException { 
 //		
 //		logger.info("unSubscribeUserGroup Call");
-//		int groupSeq  = (int) Math.ceil(((double)tokens.size()) / groupSize);
+//		int groupSeq  = (int) Math.ceil(((double)tokens.size()) / GROUP_SIZE);
 //			
 //    	for(int i = 0; i < groupSeq; i ++) {
 //    		TopicManagementResponse response = fireMessaing.unsubscribeFromTopic(tokens, null);

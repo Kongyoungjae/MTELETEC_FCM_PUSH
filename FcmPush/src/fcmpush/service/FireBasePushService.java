@@ -28,36 +28,25 @@ public class FireBasePushService {
 	
 
 	public void push(HashMap<String, Object> nowDateTime) throws InterruptedException, FirebaseMessagingException, IOException {
+
 		
 		List<HashMap<String, Object>> pushList = repository.selectTodayPushInfoByNowDateTime(nowDateTime);
 		
 		if(isPushTime(pushList) && notDuplicatePush(pushList)) {
-//		if(isPushTime(pushList)) {
 			logger.info("푸쉬 시간이면서 중복발송이 아닌경우");
-			
+			PushGroupService pushGroupService = new PushGroupService();		
 			if(todayFristPush()) {
-				List<String> tokens = repository.selectUsersTokenAfter4AM();				
-				PushGroupService pushGroupService = new PushGroupService();
-				pushGroupService.makeReceiveUserGroupJoinedToday(tokens);
+				List<String> tokens = repository.selectUsersTokenAfter4AM();						
+				pushGroupService.createReceiveUserGroupJoinedToday(tokens);
 			} 		
 			else {
-				//
-				
+				HashMap<String, Object> lastPushTime  = repository.selectPushHistLastPushTime();				
+				List<String> tokens = repository.selectJoinUsersTokenAfterLastPushTime(lastPushTime);
+				pushGroupService.createReceiveUserGroupJoinedToday(tokens);
 			}
 			
-			// PushTarget target = PushTargetFactory.getTarget(pushList);
-
 			
-			
-			/*
-			 * 오늘 첫 푸쉬인경우
-			 * ex ) 2022-06-21 00:00 ~ 2022-06-21 15:00(푸쉬시간) 까지 그룹핑
-			 *   -> 1) hist table 오늘일자 기준 count가 0이면 첫발송
-			 *        : 그룹핑해야지
-			 *        :
-			 *   -> 2) 오늘일자기준 가장가까운 푸쉬데이터가 처음이란 소리고
-			 * 
-			 */			
+//			// PushTarget target = PushTargetFactory.getTarget(pushList);		
 		}		
 	}
 	
