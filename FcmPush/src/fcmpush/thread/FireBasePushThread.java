@@ -14,11 +14,11 @@ public class FireBasePushThread {
 	public void run() {
 
 		try {
-			HashMap<String, Object> map = new HashMap<String, Object>();
-			map.put("nowDateTime", DateUtil.getNowHourMinuate());
+			HashMap<String, Object> nowDateTime = new HashMap<String, Object>();
+			nowDateTime.put("nowDateTime", DateUtil.getNowHourMinuateStr());
 					
 			FireBasePushService service = new FireBasePushService();
-			service.push(map);				
+			service.pushProcess(nowDateTime);				
 		} catch(Exception e) {
 			e.printStackTrace();
 		}

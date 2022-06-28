@@ -1,10 +1,9 @@
 package fcmpush.enumeration;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @Getter
-public enum FireBasePushEnum {
+public enum FireBaseEnum {
 
 	 KEY_PATH("fireBase/serviceAccountKey.json")
 	,SEND_URL("https://www.googleapis.com/auth/cloud-platform")
@@ -15,11 +14,11 @@ public enum FireBasePushEnum {
 	private String value;
 	private int size;
 
-	FireBasePushEnum(String value) {
+	FireBaseEnum(String value) {
 		this.value = value;
 	}
 	
-	FireBasePushEnum(int size) {
+	FireBaseEnum(int size) {
 		this.size = size;
 	}
 }

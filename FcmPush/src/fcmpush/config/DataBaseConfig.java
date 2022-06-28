@@ -6,6 +6,7 @@ import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.session.SqlSessionFactoryBuilder;
+import org.apache.ibatis.transaction.Transaction;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -17,14 +18,15 @@ public class DataBaseConfig {
 	
 	private static SqlSessionFactory adminFactory;
 	private static SqlSessionFactory serviceFactory;
-
-	public DataBaseConfig() {		
-		if(!notSqlFactoryNull()) {
+	
+	public static void init() { 
+		if(sqlFactoryNull()) {
+			logger.info("databaseConfig Init");
 			initSqlFactory();
-		}		
+		}			
 	}
 	
-	private void initSqlFactory() {
+	private static void initSqlFactory() {
 		
 		try {
 			String resource = "mybatis-config.xml";
@@ -33,6 +35,7 @@ public class DataBaseConfig {
 
 			adminFactory   = new SqlSessionFactoryBuilder().build(adminInputStream, "admin");
 			serviceFactory = new SqlSessionFactoryBuilder().build(serviceInputStream,"service");
+			
 		
 		} catch ( Exception e ) {
 			logger.error("exception/ SMSdao()"+StackTraceLogUtil.getStackTraceString(e));
@@ -43,11 +46,9 @@ public class DataBaseConfig {
 		SqlSession adminSession = null;
 
 		try {
-			if(notSqlFactoryNull()) {
-				adminSession = adminFactory.openSession();
-			} else {
-				return null;
-			}
+			
+			adminSession = adminFactory.openSession();
+			
 		} catch( Exception e ) {
 			logger.error("exception/ SMSdao::getAdminSession()"+StackTraceLogUtil.getStackTraceString(e));
 
@@ -58,12 +59,8 @@ public class DataBaseConfig {
 	public SqlSession getServiceSession() {
 		SqlSession serviceSession = null;
 
-		try {
-			if(notSqlFactoryNull()) {
-				serviceSession = serviceFactory.openSession();
-			} else {
-				return null;
-			}
+		try {			
+			serviceSession = serviceFactory.openSession();
 		} catch( Exception e ) {
 			logger.error("exception/ SMSdao::getServiceSession()"+StackTraceLogUtil.getStackTraceString(e));
 		}
@@ -71,12 +68,11 @@ public class DataBaseConfig {
 		return serviceSession;
 	}
 	
-	private boolean notSqlFactoryNull() {
+	private static boolean sqlFactoryNull() {
 		
 		if(serviceFactory == null || adminFactory == null ) {
-			return false;
+			return true;
 		} 
-		return true;
+		return false;
 	}
-
 }

@@ -111,7 +111,7 @@ public class FireBaseRepository {
 	public List<String> selectUsersTokenBefore4AM() {
 		String query = "selectUsersTokenBefore4AM";
 		List<String> tokens = new ArrayList<String>();
-		
+
 		SqlSession session = dbconfig.getServiceSession();
 
 		if( session == null ) {
@@ -191,13 +191,9 @@ public class FireBaseRepository {
 		
 		return count;
 	}
-	
-	
-	
 	// 모든 푸쉬 그룹 삭제
-	public int deleteAllReceiveGroups() {
-		String query = "deleteAllReceiveGroups";
-		int deleteYn = 0;
+	public void deleteAllPushGroups() {
+		String query = "deleteAllPushGroups";
 		
 		SqlSession session = dbconfig.getAdminSession();
 
@@ -206,18 +202,16 @@ public class FireBaseRepository {
 			throw new NullPointerException();
 		}
 		try {
-			deleteYn = session.delete("deleteAllReceiveGroups");
+			session.delete(query);
 		} catch ( Exception e ) {
 			logger.error("exception/ SMSdao::selectOne()"+StackTraceLogUtil.getStackTraceString(e));
 		} finally {
 			session.commit();
 			session.close();
 		}
-		
-		return deleteYn;
 	}
 
-	// 푸쉬그룹 DB INSERT
+	// 푸쉬그룹 INSERT
 	public void insertPushGroup(HashMap<String, Object> param) {
 		
 		String query = "insertPushGroup";
@@ -228,7 +222,7 @@ public class FireBaseRepository {
 			logger.info("sqlSession is null. not running query.");
 		}
 		try {
-			session.insert("insertPushGroup",param);
+			session.insert(query,param);
 
 		} catch ( Exception e ) {
 			session.rollback();
@@ -238,9 +232,26 @@ public class FireBaseRepository {
 			session.close();
 		}
 	}
+	
+	// 푸쉬이력 INSERT
+	public void insertPushHist(HashMap<String, Object> param) {
+		
+		String query = "insertPushHist";
+		
+		SqlSession session = dbconfig.getAdminSession();
 
+		if( session == null ) {
+			logger.info("sqlSession is null. not running query.");
+		}
+		try {
+			session.insert(query , param);
 
-
-
-
+		} catch ( Exception e ) {
+			session.rollback();
+			logger.error("exception/ SMSdao::selectOne()"+StackTraceLogUtil.getStackTraceString(e));
+		} finally {
+			session.commit();
+			session.close();
+		}
+	}
 }

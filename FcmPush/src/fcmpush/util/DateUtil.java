@@ -13,16 +13,31 @@ public class DateUtil {
 				  nowDateTime.getYear()
 				, nowDateTime.getMonth()
 				, nowDateTime.getDayOfMonth()
-				, 11
-				, 0
-				, 0);
+				, 04
+				, 00
+				, 00);
 		
 		Date date = Date.from(startTime.atZone(ZoneId.systemDefault()).toInstant());
 	 
 		return date; 
 	}
 	
-	public static String getNowHourMinuate() {	
+//	public static Date getNowHourMinuateDate() {	
+//		LocalDateTime nowDateTime = LocalDateTime.now();
+//		LocalDateTime startTime = LocalDateTime.of(
+//				  nowDateTime.getYear()
+//				, nowDateTime.getMonth()
+//				, nowDateTime.getDayOfMonth()
+//				, nowDateTime.getHour()
+//				, nowDateTime.getMinute()
+//				, 00);
+//		
+//		Date date = Date.from(startTime.atZone(ZoneId.systemDefault()).toInstant());
+//	 
+//		return date; 
+//	}
+	
+	public static String getNowHourMinuateStr() {	
 		LocalDateTime nowDateTime = LocalDateTime.now();
 		LocalDateTime startTime = LocalDateTime.of(
 				  nowDateTime.getYear()
@@ -33,9 +48,7 @@ public class DateUtil {
 				, 0);
 		
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMddHHmm00");
-		
-		startTime.format(formatter);
-	 
+			 
 		return startTime.format(formatter); 
 	}
 	

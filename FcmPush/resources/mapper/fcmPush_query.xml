@@ -7,13 +7,18 @@
     <select id="selectTodayPushInfoByNowDateTime" parameterType="map" resultType="hashmap" >      
        SELECT 
         	PUSH_ID
+           ,TITLE
+           ,BODY
+           ,IMG
+           ,URL
+           ,REL_DT
+           ,SEND_TARGET
          FROM TB_PUSH
         WHERE 
         <![CDATA[ 
         	REL_DT = DATE_FORMAT(#{nowDateTime},'%Y-%m%-%d %H:%i:%s') 
         	AND SEND_YN = 'Y'
         ]]>
-        	
     </select>
     
     <!-- duplicate 관련 이름으로 바꾸면 좋을거같다 -->
@@ -29,34 +34,40 @@
     <select id="selectUsersTokenBefore4AM" parameterType="map" resultType="String" >
         SELECT 
         	FCM_TOKEN
+          , MIN(REG_DT)
         FROM TB_USER
         WHERE
         <![CDATA[
         	REG_DT <= DATE_FORMAT(NOW(),'%Y-%m%-%d 03:59:59')
         ]]>
-        ORDER BY REG_DT ASC
+        GROUP BY FCM_TOKEN 
+	    ORDER BY MIN(REG_DT) ASC
     </select>
     
     <select id="selectUsersTokenAfter4AM" parameterType="map" resultType="String" >
         SELECT 
         	FCM_TOKEN
+          , MIN(REG_DT)
         FROM TB_USER
         WHERE
         <![CDATA[
         	REG_DT >= DATE_FORMAT(NOW(),'%Y-%m%-%d 04:00:00')
         ]]>
-        ORDER BY REG_DT ASC
+        GROUP BY FCM_TOKEN 
+	    ORDER BY MIN(REG_DT) ASC
     </select>
 
     <select id="selectJoinUsersTokenAfterLastPushTime" parameterType="map" resultType="String" >
         SELECT 
         	FCM_TOKEN
+          , MIN(REG_DT)
         FROM TB_USER
         WHERE
         <![CDATA[
         	REG_DT >= DATE_FORMAT(#{REL_DT},'%Y-%m%-%d %H:%i:%s')
         ]]>
-        ORDER BY REG_DT ASC
+        GROUP BY FCM_TOKEN 
+	    ORDER BY MIN(REG_DT) ASC
     </select>     
     
     <select id="selectPushHistLastPushTime" resultType="hashmap" >
@@ -104,8 +115,25 @@
    		   ,NOW()
    		)
     </insert>
+    
+    <insert id="insertPushHist">
+    	INSERT INTO TB_PUSH_HIST
+   		(
+   		    REL_DT
+   		   ,PUSH_ID
+   		   ,SEND_TARGET
+   		   ,SENT
+   		)
+   		VALUES 
+   		(
+   		    #{REL_DT}
+   		   ,#{PUSH_ID}
+   		   ,#{SEND_TARGET}
+   		   ,'Y'
+   		)
+    </insert>
 
-    <delete id="deleteAllReceiveGroups"> 
+    <delete id="deleteAllPushGroups"> 
     	DELETE 
     	 FROM TB_PUSH_GROUP 
     	WHERE 1=1

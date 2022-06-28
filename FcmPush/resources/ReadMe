@@ -1,29 +1,51 @@
+
+**남은거
 1. 트랜잭션 처리
-2. 타겟 구분별 푸쉬
-3. 실제 스레드가 잘도는치 확인 
-4. 에러처리, 익셉션...
+2. 타겟 구분별 푸쉬 O
+3. 전체 프로세스 잘 도는지 확인 △
+4. 에러처리, 익셉션 △
+5. 푸쉬시간 동안 발송을 완료하지 못한경우 다음시간 체크시 △
+6. 중복 그룹방지 (하나의 토큰이 여러개의 그룹을 가지면안됌) O (매일4시마다 모든 그룹삭제 후 재생성)
+7. 푸쉬가 많을경우 타임아웃 에러
+8. FCM 서버가 주제 전송 요청에 성공 또는 실패 응답을 반환하는 데 최대 30초의 지연이 발생할 수 있습니다. 요청에서 이 지연 시간에 맞게 앱 서버 제한 시간 값을 설정해야 합니다. (document)
 
 
-5. 푸쉬시간 동안 발송을 완료하지 못한경우
-   다음시간 체크시..
-   
-6. 중복 그룹방지 (하나의 토큰이 여러개의 그룹을 가지면안됌)
-
-
-
-
-※ 단위 테스트 하기가 너무안좋음...
-  
-  
 *고려사항
-	: 오늘 4시이전까지 그룹핑 ( 전체 유저 )
-	: 4시이후 사용자에 대한 그룹핑을 해야함
-	   -같은날 두번째 발송시 첫번쨰 발송~두번쨰 발송까지 가입한 유저들 그룹핑
-	: 시간 조건이 빠지면 중복 그룹핑 & 중복 발송이 될수 있다
-			
+	: 오늘 4시이전까지 그룹핑 ( 전체 유저 ) O
+	: 4시이후 사용자에 대한 그룹핑을 해야함 O
+	   -같은날 두번째 발송시 첫번쨰 발송~두번쨰 발송까지 가입한 유저들 그룹핑 O
+	: 시간 조건이 빠지면 중복 그룹핑 & 중복 발송이 될수 있다 O
+	: FCM 서버가 주제 전송 요청에 성공 또는 실패 응답을 반환하는 데 최대 30초의 지연이 발생할 수 있습니다. 요청에서 이 지연 시간에 맞게 앱 서버 제한 시간 값을 설정해야 합니다. (document)	
+	
+		
 *오류예상
-	1) 발송은했는데 hist 테이블에 안쌓였으면..?	-> 그룹이 꼬일가능성이 있다.
-	2) 발송한 시간이 오늘일자가 아니면 (처음푸쉬 프로세스를 타겟죠)
-	3) A,B,C -> Topic1 구독 , A,B,C,D -> Topic1 구독 => expect) 1Push 
-	4) A,B,C -> Topic1 구독  ,D,E,F -> Topic1 구독
-		=> expect) (A,B,C,D,E,F) PUSH or (D,E,F) PSUH
+	1) 당일 푸쉬가 2건 이상일떄 푸쉬 발송은했는데 hist 테이블에 안쌓였으면..?	-> (푸쉬시간 시간을 기준으로 그룹핑하기떄문에 그룹이 꼬일가능성이 있다.)
+	2) A,B,C -> Topic1 구독 , A,B,C,D -> Topic1 구독 => expect) ABCD 발송  => result) ABCD 발송
+	3) LIST에 비정상적 토큰이 있는경우 구독취소 실행 => expect) 정상적인애들은 취소가된다
+	4) 토큰 관리( 당일 탈퇴후 => 재가입)?????
+	5) 리스트에 순서가 보장이 되는가 => REG_DT 기준 정렬해서 잘담아온다
+	
+
+**오류
+   :  The last packet successfully received from the server was 30,289,314 milliseconds ago.  
+   	  The last packet sent successfully to the server was 30,289,315 milliseconds ago. 
+   	  is longer than the server configured value of 'wait_timeout'. 
+   	  You should consider either expiring and/or testing connection validity before use in your application, 
+   	  increasing the server configured values for client timeouts, or using the Connector/J connection property 'autoReconnect=true' 
+   	  to avoid this problem.
+   :  푸쉬가 많을경우 타임아웃 에러 너무 많은 전송요청 발생 (INTERVAL을 좀더줘야하나..?)
+   
+   
+ **테스트 케이스
+   	       그룹화   그룹화DB   첫푸쉬여부  푸쉬정보  다중푸쉬여부  4시이후가입자
+ 	CASE1    X       X       X        O        X          X		   	=>  OK
+ 	
+    CASE2    O       O       O        O        O          X         =>  OK
+     
+    CASE3    O       O       X        O        O          X         =>  OK
+    
+    CASE4    O       O       O        O        O          O         =>  OK (다른 USER아이디로 테스하니까 됨)
+     
+    
+    
+           

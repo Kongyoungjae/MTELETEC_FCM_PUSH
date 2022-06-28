@@ -1,12 +1,16 @@
 package fcmpush.main;
 
+import java.io.IOException;
 import java.util.Timer;
 import java.util.TimerTask;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import fcmpush.enumeration.FireBaseIntervalEnum;
+import fcmpush.config.DataBaseConfig;
+import fcmpush.config.FireBaseConfig;
+import fcmpush.enumeration.FireBaseEnum;
+import fcmpush.enumeration.IntervalEnum;
 import fcmpush.exception.ErrorHandler;
 import fcmpush.exception.ExceptionHandler;
 import fcmpush.thread.FireBasePushThread;
@@ -26,33 +30,36 @@ public class Main {
 	public static void run () {
 		
 		try {
+			
+			DataBaseConfig.init();
+			FireBaseConfig.init();			
+			Thread.sleep(1000);
+			
 			// 수신그룹 만들기 스레드
-//			Timer receiveGroupTimer = new Timer();
-//			TimerTask makeReceiveGroupTask = new TimerTask() {			
-//				@Override
-//				public void run() {
-//					MakeGroupThread groupThread = new MakeGroupThread();
-//					groupThread.run();
-//				}			
-//			};
-//			receiveGroupTimer.scheduleAtFixedRate(makeReceiveGroupTask, DateUtil.todayFourAm().getTime() , FireBaseIntervalEnum.All_GROUP_CREATE_INTERVAL.getInterval());
+			Timer receiveGroupTimer = new Timer();
+			TimerTask makeReceiveGroupTask = new TimerTask() {			
+				@Override
+				public void run() {
+					PushGroupThread groupThread = new PushGroupThread();
+					groupThread.run();
+				}			
+			};
+			receiveGroupTimer.scheduleAtFixedRate(makeReceiveGroupTask, DateUtil.todayFourAm() , IntervalEnum.All_GROUP_CREATE_INTERVAL.getInterval());
 			
 			//푸쉬 스레드
 			Timer pushTimer = new Timer();
 			TimerTask pushTask = new TimerTask() {			
 				@Override
-				public void run() {
-					
+				public void run() {					
 					FireBasePushThread pushThread = new FireBasePushThread();
 					pushThread.run();
 
 				}
 			};
-			pushTimer.scheduleAtFixedRate(pushTask, 0, 1000);
-			Thread.sleep(1000);
-
-		}
-		
+			pushTimer.scheduleAtFixedRate(pushTask, 0 , 1000 * 30 ); // IntervalEnum.PUSH_CHECK_INTERVAL.getInterval()
+			
+ 
+		}		
 		catch(RuntimeException e) {	
 			throw new ExceptionHandler(e);	
 		} 
@@ -61,6 +68,8 @@ public class Main {
 		} 	
 		catch(Error e) {	
 			throw new ErrorHandler(e);
+		} catch (IOException e) {
+			throw new ExceptionHandler(e);
 		}
 	}
 }

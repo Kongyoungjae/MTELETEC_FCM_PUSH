@@ -2,47 +2,43 @@ package fcmpush.config;
 
 import java.io.IOException;
 import java.io.InputStream;
-
+import org.apache.ibatis.io.Resources;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
-
-import fcmpush.enumeration.FireBasePushEnum;
-
+import com.google.firebase.messaging.FirebaseMessaging;
+import fcmpush.enumeration.FireBaseEnum;
 
 public class FireBaseConfig  {
-	private final Logger logger = LogManager.getLogger();
-	private static FirebaseApp fireBaseApp;
+	private static final Logger logger = LogManager.getLogger();
+	private static FirebaseApp fireBaseApp = null;
+	private static FirebaseMessaging firebaseMessaging = null;
 	
-	//ADC 인증
-	public FirebaseApp initFireBaseApp() throws IOException  {
+	public static void init() throws IOException { 
+		logger.info("FireBaseConfig Init");
 		
-		if(fireBaseApp == null) {
-			logger.info("FirebaseApp 초기화");
-			InputStream resource = this.getClass().getClassLoader().getResourceAsStream(FireBasePushEnum.KEY_PATH.getValue());
-			
-			FirebaseOptions options = FirebaseOptions.builder()
-					.setCredentials(GoogleCredentials.fromStream(resource))
-					.build();
-			fireBaseApp = FirebaseApp.initializeApp(options); 
-		} 
-		 return fireBaseApp; 
+		if(fireBaseApp == null) 
+			initFireBaseApp();
+		
+		if(firebaseMessaging == null)  
+			firebaseMessaging = FirebaseMessaging.getInstance(fireBaseApp);
 	}
 	
-	// OAUTH2
-	public String getAccessToken() throws IOException {
+	//ADC 인증
+	private static void initFireBaseApp() throws IOException {
 
-		InputStream resource = this.getClass().getClassLoader().getResourceAsStream(FireBasePushEnum.KEY_PATH.getValue());
-		
-		GoogleCredentials googleCredentials = GoogleCredentials
-				.fromStream(resource)
-				.createScoped(FireBasePushEnum.SEND_URL.getValue());
-		googleCredentials.refreshIfExpired();
-		
-		return googleCredentials.getAccessToken().getTokenValue();
+		InputStream resource = Resources.getResourceAsStream(FireBaseEnum.KEY_PATH.getValue());
+		FirebaseOptions options = FirebaseOptions.builder()
+				.setCredentials(GoogleCredentials.fromStream(resource))
+				.build();
+		fireBaseApp = FirebaseApp.initializeApp(options); 
 
+	}
+	
+	public static synchronized FirebaseApp getInstanceFireBaseApp(){
+		return fireBaseApp; 
 	}
 }
