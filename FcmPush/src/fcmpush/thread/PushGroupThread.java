@@ -18,7 +18,7 @@ public class PushGroupThread {
 		
 		try {
 			PushGroupService service = new PushGroupService();
-			service.makeReceiveUserGroup();
+			service.groupProcess();
 			logger.info("PushGroupThread 완료");
 		} catch (Error e) {
 			throw new ErrorHandler(e);

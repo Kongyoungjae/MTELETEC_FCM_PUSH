@@ -23,20 +23,27 @@ public class FireBasePushService {
 	}
 	
 	public void pushProcess(HashMap<String, Object> nowDateTime) throws InterruptedException, FirebaseMessagingException, IOException {		
+		
+		if(0 == repository.selectPushGroupCount()) {
+			PushGroupService pushGroupService = new PushGroupService();
+			pushGroupService.groupProcess();
+		}
+		
 		List<HashMap<String, Object>> pushList = repository.selectTodayPushInfoByNowDateTime(nowDateTime);	
 		
 		if(isPushTime(pushList) && notDuplicatePush(pushList)) {
 			PushGroupService pushGroupService = new PushGroupService();		
 			if(isFristPushToday()) {
-				logger.info("오늘 첫푸쉬: 4시이후 가입자들 목록");
-				List<String> tokens = repository.selectUsersTokenAfter4AM();						
-				pushGroupService.createReceiveUserGroupJoinedToday(tokens);
+				logger.info("오늘 1번쨰 푸쉬");
+				List<String> tokens = repository.selectTodayUsersTokenAfter4AM();						
+				pushGroupService.createReceiveGroupJoinedAfter4amToday(tokens);
 			} 		
 			else {
-				logger.info("오늘 첫푸쉬X: 마지막 푸쉬 시간이후 가입자들 목록");
+				logger.info("오늘 n번쨰 푸쉬");
 				HashMap<String, Object> lastPushTime  = repository.selectPushHistLastPushTime();				
 				List<String> tokens = repository.selectJoinUsersTokenAfterLastPushTime(lastPushTime);
-				pushGroupService.createReceiveUserGroupJoinedToday(tokens);
+				logger.info("마지막 푸쉬 시간이후 가입자수:"+tokens.size());
+				pushGroupService.createReceiveGroupJoinedAfter4amToday(tokens);
 			}
 			
 			for(HashMap<String, Object> pushInfo : pushList) {

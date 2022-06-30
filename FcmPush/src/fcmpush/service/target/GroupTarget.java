@@ -14,16 +14,16 @@ public class GroupTarget extends PushTarget {
 
 	@Override
 	public void push(HashMap<String, Object> pushInfo) throws FirebaseMessagingException {
-		
+		int groupseq = repository.selectMaxGroupSEQ();
 		String title = pushInfo.get("TITLE").toString();
 		String body = pushInfo.get("BODY").toString();
 		String img =  pushInfo.get("IMG").toString();
-		int groupseq = repository.selectMaxGroupSEQ();
+		
 		
 		logger.info("그룹푸쉬 그룹숫자:"+groupseq);
 		logger.info("푸쉬정보:" + pushInfo.toString());
 		
-		for(int i=0; i < groupseq; i++) {
+		for(int i=1; i <= groupseq; i++) {
 			Message message = Message.builder()
 					.setNotification(Notification.builder()
 							.setTitle(title)

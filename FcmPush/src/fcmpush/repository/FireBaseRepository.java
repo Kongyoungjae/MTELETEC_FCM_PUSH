@@ -108,8 +108,8 @@ public class FireBaseRepository {
 	
 	
 	// 오전 4시이전 가입한 토큰 가져오기
-	public List<String> selectUsersTokenBefore4AM() {
-		String query = "selectUsersTokenBefore4AM";
+	public List<String> selectUsersAllTokenBefore4AM() {
+		String query = "selectUsersAllTokenBefore4AM";
 		List<String> tokens = new ArrayList<String>();
 
 		SqlSession session = dbconfig.getServiceSession();
@@ -130,8 +130,8 @@ public class FireBaseRepository {
 	}
 	
 	// 오전4시 이후 가입한 토큰 가져오기
-	public List<String> selectUsersTokenAfter4AM() {
-		String query = "selectUsersTokenAfter4AM";
+	public List<String> selectTodayUsersTokenAfter4AM() {
+		String query = "selectTodayUsersTokenAfter4AM";
 		List<String> tokens = new ArrayList<String>();
 		
 		SqlSession session = dbconfig.getServiceSession();
@@ -253,5 +253,70 @@ public class FireBaseRepository {
 			session.commit();
 			session.close();
 		}
+	}
+	
+	//오늘 4시 이후 가장작은 그룹순번 
+	public int selectTodayMinGroupSeqAfter4am() {
+		final String query = "selectTodayMinGroupSeqAfter4am";
+		int minSEQ = 0;
+			
+		SqlSession s = dbconfig.getAdminSession();
+		if( s == null ) {
+			logger.info("sqlSession is null. not running query.");
+			throw new NullPointerException();
+		}
+		
+		try {
+			minSEQ = s.selectOne(query);
+		} catch ( Exception e ) {
+			logger.error("exception/ SMSdao::selectOne()"+StackTraceLogUtil.getStackTraceString(e));
+		} finally {
+			s.close();
+		}
+		
+		return minSEQ;
+	}
+
+	//오늘 오후 4시이후 만들어진 푸쉬그룹 카운트
+	public int selectTodayCreatedPushGroupCountAfter4AM() {
+		final String query = "selectTodayCreatedPushGroupCountAfter4AM";
+		int count = 0;
+			
+		SqlSession s = dbconfig.getAdminSession();
+		if( s == null ) {
+			logger.info("sqlSession is null. not running query.");
+			throw new NullPointerException();
+		}
+		
+		try {
+			count = s.selectOne(query);
+		} catch ( Exception e ) {
+			logger.error("exception/ SMSdao::selectOne()"+StackTraceLogUtil.getStackTraceString(e));
+		} finally {
+			s.close();
+		}
+		
+		return count;
+	}
+
+	public int selectPushGroupCount() {
+		final String query = "selectPushGroupCount";
+		int count = 0;
+			
+		SqlSession s = dbconfig.getAdminSession();
+		if( s == null ) {
+			logger.info("sqlSession is null. not running query.");
+			throw new NullPointerException();
+		}
+		
+		try {
+			count = s.selectOne(query);
+		} catch ( Exception e ) {
+			logger.error("exception/ SMSdao::selectOne()"+StackTraceLogUtil.getStackTraceString(e));
+		} finally {
+			s.close();
+		}
+		
+		return count;
 	}
 }

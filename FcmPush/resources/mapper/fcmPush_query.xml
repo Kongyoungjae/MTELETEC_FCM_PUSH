@@ -31,23 +31,21 @@
 	      AND SENT = 'Y'
     </select>
     
-    <select id="selectUsersTokenBefore4AM" parameterType="map" resultType="String" >
+    <select id="selectUsersAllTokenBefore4AM" parameterType="map" resultType="String" >
         SELECT 
         	FCM_TOKEN
-          , MIN(REG_DT)
         FROM TB_USER
         WHERE
         <![CDATA[
-        	REG_DT <= DATE_FORMAT(NOW(),'%Y-%m%-%d 03:59:59')
+        	REG_DT < DATE_FORMAT(NOW(),'%Y-%m%-%d 04:00:00')
         ]]>
         GROUP BY FCM_TOKEN 
 	    ORDER BY MIN(REG_DT) ASC
     </select>
     
-    <select id="selectUsersTokenAfter4AM" parameterType="map" resultType="String" >
+    <select id="selectTodayUsersTokenAfter4AM" parameterType="map" resultType="String" >
         SELECT 
         	FCM_TOKEN
-          , MIN(REG_DT)
         FROM TB_USER
         WHERE
         <![CDATA[
@@ -60,7 +58,6 @@
     <select id="selectJoinUsersTokenAfterLastPushTime" parameterType="map" resultType="String" >
         SELECT 
         	FCM_TOKEN
-          , MIN(REG_DT)
         FROM TB_USER
         WHERE
         <![CDATA[
@@ -91,10 +88,37 @@
 		]]>
     </select>
     
+    <select id="selectPushGroupCount" parameterType="map" resultType="int" >   
+		SELECT COUNT(*)
+		  FROM TB_PUSH_GROUP
+    </select>
+        
+    <select id="selectTodayCreatedPushGroupCountAfter4AM" parameterType="map" resultType="int" >   
+		SELECT COUNT(*)
+		  FROM TB_PUSH_GROUP 
+		WHERE 
+		<![CDATA[ 
+			REG_DT >= DATE_FORMAT(DATE_SUB(NOW(),INTERVAL 1 DAY),'%Y-%m%-%d 04:00:00') 
+     	AND REG_DT <= DATE_FORMAT(NOW(),'%Y-%m%-%d 04:00:00')
+		]]>
+    </select>
+    
     <select id="selectMaxGroupSEQ" resultType="int">
     	SELECT 
     		IFNULL(MAX(GROUP_SEQ),0)
     	  FROM TB_PUSH_GROUP
+    </select>
+   			    
+    <select id="selectTodayMinGroupSeqAfter4am" resultType="int">
+	  SELECT 
+	  	 MIN(GROUP_SEQ)
+ 	  FROM TB_PUSH_GROUP
+ 	  WHERE
+ 	  <![CDATA[
+     	 REG_DT >= DATE_FORMAT(DATE_SUB(NOW(),INTERVAL 1 DAY),'%Y-%m%-%d 04:00:00') 
+     AND REG_DT <= DATE_FORMAT(NOW(),'%Y-%m%-%d 04:00:00')
+     ]]>
+     LIMIT 1
     </select>
     
     <insert id="insertPushGroup">
@@ -112,7 +136,14 @@
    		   ,#{GROUP_ID}
    		   ,#{REG_SUCCESS_CNT}
    		   ,#{REG_FAIL_CNT}
-   		   ,NOW()
+   		   ,
+   		   <if test="REG_DT == '03:59:59'">
+   		   	 DATE_FORMAT(NOW(),'%Y-%m%-%d 03:59:59')
+   		   </if> 	
+   		   <if test="REG_DT == null">
+   		   	 NOW()
+   		   </if>
+   		   	   
    		)
     </insert>
     
