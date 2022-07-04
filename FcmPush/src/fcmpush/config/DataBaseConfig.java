@@ -6,7 +6,6 @@ import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.session.SqlSessionFactoryBuilder;
-import org.apache.ibatis.transaction.Transaction;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -19,14 +18,14 @@ public class DataBaseConfig {
 	private static SqlSessionFactory adminFactory;
 	private static SqlSessionFactory serviceFactory;
 	
-	public static void init() { 
+	static {
 		if(sqlFactoryNull()) {
 			logger.info("databaseConfig Init");
-			initSqlFactory();
+			init();
 		}			
 	}
 	
-	private static void initSqlFactory() {
+	public static void init() {
 		
 		try {
 			String resource = "mybatis-config.xml";

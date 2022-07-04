@@ -37,20 +37,6 @@ public class DateUtil {
 		return date; 
 	}
 	
-	public static Date nowDateTime() {	
-		LocalDateTime nowDateTime = LocalDateTime.now();
-		LocalDateTime startTime = LocalDateTime.of(
-				  nowDateTime.getYear()
-				, nowDateTime.getMonth()
-				, nowDateTime.getDayOfMonth()
-				, nowDateTime.getHour()
-				, 56
-				, 00);
-		
-		Date date = Date.from(startTime.atZone(ZoneId.systemDefault()).toInstant());
-	 
-		return date; 
-	}
 	
 	public static String getNowHourMinuateStr() {	
 		LocalDateTime nowDateTime = LocalDateTime.now();
@@ -65,5 +51,21 @@ public class DateUtil {
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMddHHmm00");
 			 
 		return startTime.format(formatter); 
+	}
+	
+	public static Date nowDateTimePlusOneMinute() {	
+		LocalDateTime nowDateTime = LocalDateTime.now();
+		LocalDateTime startTime = LocalDateTime.of(
+				  nowDateTime.getYear()
+				, nowDateTime.getMonth()
+				, nowDateTime.getDayOfMonth()
+				, nowDateTime.getHour()
+				, nowDateTime.getMinute() + 1
+				, 0);
+		
+		
+		Date date = Date.from(startTime.atZone(ZoneId.systemDefault()).toInstant());
+			 
+		return date; 
 	}
 }

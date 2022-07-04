@@ -111,7 +111,7 @@
    			    
     <select id="selectTodayMinGroupSeqAfter4am" resultType="int">
 	  SELECT 
-	  	 MIN(GROUP_SEQ)
+	  	 IFNULL(MIN(GROUP_SEQ),0)
  	  FROM TB_PUSH_GROUP
  	  WHERE
  	  <![CDATA[

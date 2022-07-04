@@ -13,6 +13,7 @@ import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.FirebaseMessagingException;
 import com.google.firebase.messaging.TopicManagementResponse;
 
+import fcmpush.config.DataBaseConfig;
 import fcmpush.config.FireBaseConfig;
 import fcmpush.enumeration.FireBaseEnum;
 import fcmpush.repository.FireBaseRepository;
@@ -25,7 +26,8 @@ public class PushGroupService {
 	private FirebaseMessaging fireBaseMessaing;
 	
 	public PushGroupService() {
-		repository = new FireBaseRepository();
+		
+		repository = new FireBaseRepository();	
 		fireBaseMessaing = FirebaseMessaging.getInstance(FireBaseConfig.getInstanceFireBaseApp());
 	}
 	
@@ -116,28 +118,21 @@ public class PushGroupService {
     	
 		int minGroupSeqTodayAfter4am = repository.selectTodayMinGroupSeqAfter4am();
     	int maxGroupSeq = repository.selectMaxGroupSEQ();
-    	int count = 0;
-		for(int i = 0; i < tokensAfter4am.size(); i += GROUP_SIZE) {
-    		List<String> unbScribeTokens = splitTokenListByGroupSize(i, tokensAfter4am);  		
-    		for(int j = minGroupSeqTodayAfter4am; j <= maxGroupSeq; j++) {
-    			TopicManagementResponse response = fireBaseMessaing.unsubscribeFromTopic(unbScribeTokens, FireBaseEnum.GROUP_NAME.getValue() + j);
-        		logger.info(j+"번쨰 그룹구독 취소");
-        		logger.info("구독 취소성공 카운트:"+response.getSuccessCount());
-        		logger.info("구독 취소실패 카운트:"+response.getFailureCount());
-        		count ++;
-    		}
-		logger.info("루프돈횟수!!:"+count);
-    	}
+
+    	if(minGroupSeqTodayAfter4am != maxGroupSeq) {
+    		for(int i = 0; i < tokensAfter4am.size(); i += GROUP_SIZE) {
+        		List<String> unbScribeTokens = splitTokenListByGroupSize(i, tokensAfter4am);	
+        		// 15 = 15				
+        		for(int j = minGroupSeqTodayAfter4am; j <= maxGroupSeq; j++) {
+        			TopicManagementResponse response = fireBaseMessaing.unsubscribeFromTopic(unbScribeTokens, FireBaseEnum.GROUP_NAME.getValue() + j);
+            		logger.info(j+"번쨰 그룹구독 취소");
+            		logger.info("구독 취소성공 카운트:"+response.getSuccessCount());
+            		logger.info("구독 취소실패 카운트:"+response.getFailureCount());
+        		}
+        	}
+    	}	
 	}
-	//오늘 4시 이후 푸쉬 그룹이 생성된 적이 있으면
-//	public boolean isTodayCreatedPushGroupAfter4AM() {		
-//	   int count = repository.selectTodayCreatedPushGroupCountAfter4AM(); 
-//	   if(count != 0) {		 
-//		   return true;
-//	   }
-//	   return false;
-//	}
-    
+	
 	private List<String> splitTokenListByGroupSize(int index, List<String> tokens) {
 		if(index + GROUP_SIZE > tokens.size()) {
 			tokens = tokens.subList(index, tokens.size());
