@@ -25,8 +25,7 @@ public class PushGroupService {
 	private FireBaseRepository repository;
 	private FirebaseMessaging fireBaseMessaing;
 	
-	public PushGroupService() {
-		
+	public PushGroupService() {	
 		repository = new FireBaseRepository();	
 		fireBaseMessaing = FirebaseMessaging.getInstance(FireBaseConfig.getInstanceFireBaseApp());
 	}
@@ -36,10 +35,10 @@ public class PushGroupService {
 
 		// 매일 오전 03:59:59 까지 가입한 유저 토큰
 		List<String> allTokensBefore4am = repository.selectUsersAllTokenBefore4AM();
-		List<String> tokensTodayAfter4am = repository.selectTodayUsersTokenAfter4AM();
-		
-		//주제 구독 취소
 		unSubScribeFcmTopicByAllToken(allTokensBefore4am);
+		
+		// 매일 오전 04:00:00 후 가입한 유저 토큰
+		List<String> tokensTodayAfter4am = repository.selectTodayUsersTokenAfter4AM();
 		unSubScribeFcmTopicByTodayAfter4AM(tokensTodayAfter4am);
 	
 		// DB 모든 그룹정보 삭제
@@ -52,11 +51,12 @@ public class PushGroupService {
 	private void createReceiveGroupJoinedBefore4amToday (List<String> allTokensBefore4am) throws FirebaseMessagingException { 
 		logger.info("오늘 04:00 이전에 가입한 유저들 그룹핑");	
 		int groupSeq = 1;
+		List<HashMap<String, Object>> paramList = new LinkedList<HashMap<String,Object>>();
+		
 		for(int i = 0; i < allTokensBefore4am.size(); i += GROUP_SIZE) {
     		List<String> regTokens = splitTokenListByGroupSize(i, allTokensBefore4am);
 			TopicManagementResponse response = fireBaseMessaing.subscribeToTopic(regTokens, FireBaseEnum.GROUP_NAME.getValue() + groupSeq);
-    		
-			logger.info(groupSeq+"번쨰 그룹등록");
+			logger.info(groupSeq+"번쨰그룹 등록");
     		logger.info("등록 성공 카운트:"+response.getSuccessCount());
     		logger.info("등록 실패 카운트:"+response.getFailureCount());
     		
@@ -66,17 +66,18 @@ public class PushGroupService {
     		map.put("REG_SUCCESS_CNT", response.getSuccessCount());
     		map.put("REG_FAIL_CNT", response.getFailureCount());
     		map.put("REG_DT", "03:59:59");
-    		insertPushGroup(map);
-    		
+    		paramList.add(map);
     		groupSeq += 1;
     	}
+		insertPushGroup(paramList);
 	}
 	
 	public void createReceiveGroupJoinedAfter4amToday(List<String> tokensTodayAfter4am) throws IOException, FirebaseMessagingException {	
 		logger.info("오늘 04:00 이후 가입한 사람들 그룹핑");
+		List<HashMap<String, Object>> paramList = new LinkedList<HashMap<String,Object>>();
+		
 		if(tokensTodayAfter4am.size()!=0) {
 			int groupSeq = repository.selectMaxGroupSEQ() + 1;
-			
 			for(int i = 0; i < tokensTodayAfter4am.size(); i += GROUP_SIZE) {
 	    		List<String> regTokens = splitTokenListByGroupSize(i, tokensTodayAfter4am);
 				TopicManagementResponse response = fireBaseMessaing.subscribeToTopic(regTokens, FireBaseEnum.GROUP_NAME.getValue() + groupSeq);
@@ -90,39 +91,38 @@ public class PushGroupService {
 	    		map.put("GROUP_ID", FireBaseEnum.GROUP_NAME.getValue() + groupSeq);
 	    		map.put("REG_SUCCESS_CNT", response.getSuccessCount());
 	    		map.put("REG_FAIL_CNT", response.getFailureCount());
-	    		insertPushGroup(map);	    		
+	    		paramList.add(map);	    		
 	    		groupSeq += 1;
 	    	}
 		}
+		insertPushGroup(paramList);
     }
 
 	// 전체 그룹에 대한 구독 취소
 	private void unSubScribeFcmTopicByAllToken(List<String> allTokensBefore4am) throws FirebaseMessagingException {
 		logger.info("매일 오전 4시 이전 가입자들 그룹에 대한 구독취소");
-		
+
 		int groupSeq = 1;   	
     	for(int i = 0; i < allTokensBefore4am.size(); i += GROUP_SIZE) {		
     		List<String> unSubscribeTokens = splitTokenListByGroupSize(i, allTokensBefore4am); 		    	
     		TopicManagementResponse response = fireBaseMessaing.unsubscribeFromTopic(unSubscribeTokens, FireBaseEnum.GROUP_NAME.getValue() + groupSeq);
-    		logger.info(groupSeq+"번쨰 그룹구독 취소");
+    		logger.info(groupSeq+"번쨰그룹 구독 취소");
     		logger.info("구독 취소성공 카운트:"+response.getSuccessCount());
     		logger.info("구독 취소실패 카운트:"+response.getFailureCount());
-    		groupSeq++;
+    		groupSeq+=1;
     	}   	
 	}
     //매일 4시이후 가입자들 그룹에 대한 구독취소
-	//4시 이후 가입자들은 그룹핑이 완벽하게 되어있지않음 (A-10명, B-500명)
+	//4시 이후 가입자들은 그룹핑이 완벽하게 되어있지않음 (A-10명, B-500명 ,C-35명)
 	private void unSubScribeFcmTopicByTodayAfter4AM(List<String> tokensAfter4am) throws FirebaseMessagingException { 	
     	logger.info("매일 오전4시이후 가입자들 그룹에 대한 구독취소");    	
-    	logger.info(tokensAfter4am.size());
-    	
+
 		int minGroupSeqTodayAfter4am = repository.selectTodayMinGroupSeqAfter4am();
     	int maxGroupSeq = repository.selectMaxGroupSEQ();
 
     	if(minGroupSeqTodayAfter4am != maxGroupSeq) {
     		for(int i = 0; i < tokensAfter4am.size(); i += GROUP_SIZE) {
         		List<String> unbScribeTokens = splitTokenListByGroupSize(i, tokensAfter4am);	
-        		// 15 = 15				
         		for(int j = minGroupSeqTodayAfter4am; j <= maxGroupSeq; j++) {
         			TopicManagementResponse response = fireBaseMessaing.unsubscribeFromTopic(unbScribeTokens, FireBaseEnum.GROUP_NAME.getValue() + j);
             		logger.info(j+"번쨰 그룹구독 취소");
@@ -145,8 +145,8 @@ public class PushGroupService {
 	private void deleteAllPushGroups() { 	
 		repository.deleteAllPushGroups();				
 	}
-		
-	private void insertPushGroup(HashMap<String, Object> param) { 
+	
+	private void insertPushGroup(List<HashMap<String, Object>> param) {
 		 repository.insertPushGroup(param);		
 	}
 }

@@ -49,7 +49,8 @@
         FROM TB_USER
         WHERE
         <![CDATA[
-        	REG_DT >= DATE_FORMAT(NOW(),'%Y-%m%-%d 04:00:00')
+        	REG_DT >= DATE_FORMAT(DATE_SUB(NOW(),INTERVAL 1 DAY),'%Y-%m%-%d 04:00:00') 
+     	AND REG_DT <= DATE_FORMAT(NOW(),'%Y-%m%-%d 04:00:00')
         ]]>
         GROUP BY FCM_TOKEN 
 	    ORDER BY MIN(REG_DT) ASC
@@ -103,23 +104,25 @@
 		]]>
     </select>
     
-    <select id="selectMaxGroupSEQ" resultType="int">
-    	SELECT 
-    		IFNULL(MAX(GROUP_SEQ),0)
-    	  FROM TB_PUSH_GROUP
-    </select>
-   			    
     <select id="selectTodayMinGroupSeqAfter4am" resultType="int">
 	  SELECT 
 	  	 IFNULL(MIN(GROUP_SEQ),0)
  	  FROM TB_PUSH_GROUP
  	  WHERE
  	  <![CDATA[
-     	 REG_DT >= DATE_FORMAT(DATE_SUB(NOW(),INTERVAL 1 DAY),'%Y-%m%-%d 04:00:00') 
-     AND REG_DT <= DATE_FORMAT(NOW(),'%Y-%m%-%d 04:00:00')
+     	   REG_DT >= DATE_FORMAT(DATE_SUB(NOW(),INTERVAL 1 DAY),'%Y-%m%-%d 04:00:00') 
+       AND REG_DT <= DATE_FORMAT(NOW(),'%Y-%m%-%d 04:00:00')
      ]]>
      LIMIT 1
     </select>
+    
+    <select id="selectMaxGroupSEQ" resultType="int">
+    	SELECT 
+    		IFNULL(MAX(GROUP_SEQ),0)
+    	  FROM TB_PUSH_GROUP
+    </select>
+   			    
+    
     
     <insert id="insertPushGroup">
     	INSERT INTO TB_PUSH_GROUP

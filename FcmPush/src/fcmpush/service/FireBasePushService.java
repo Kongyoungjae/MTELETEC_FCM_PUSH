@@ -7,6 +7,7 @@ import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.google.common.base.Stopwatch;
 import com.google.firebase.messaging.FirebaseMessagingException;
 
 import fcmpush.repository.FireBaseRepository;
@@ -23,7 +24,8 @@ public class FireBasePushService {
 	}
 	
 	public void pushProcess(HashMap<String, Object> nowDateTime) throws InterruptedException, FirebaseMessagingException, IOException {		
-		
+		long start = System.currentTimeMillis();
+
 		if(0 == repository.selectPushGroupCount()) {
 			PushGroupService pushGroupService = new PushGroupService();
 			pushGroupService.groupProcess();
@@ -37,8 +39,7 @@ public class FireBasePushService {
 				logger.info("오늘 1번쨰 푸쉬");
 				List<String> tokens = repository.selectTodayUsersTokenAfter4AM();						
 				pushGroupService.createReceiveGroupJoinedAfter4amToday(tokens);
-			} 		
-			else {
+			} else {
 				logger.info("오늘 n번쨰 푸쉬");
 				HashMap<String, Object> lastPushTime  = repository.selectPushHistLastPushTime();				
 				List<String> tokens = repository.selectJoinUsersTokenAfterLastPushTime(lastPushTime);
@@ -49,8 +50,12 @@ public class FireBasePushService {
 			for(HashMap<String, Object> pushInfo : pushList) {
 				PushTarget target = PushTargetFactory.createPushTarget(pushInfo);
 				target.push(pushInfo);
+							
 			}
-		}		
+		}
+		
+		long end = System.currentTimeMillis();
+		logger.info("수행시간: " + (end - start) / 1000 + "s");
 	}
 	
 	//현재시간 = DB 발송시간

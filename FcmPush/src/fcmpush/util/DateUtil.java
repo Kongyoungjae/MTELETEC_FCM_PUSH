@@ -53,14 +53,14 @@ public class DateUtil {
 		return startTime.format(formatter); 
 	}
 	
-	public static Date nowDateTimePlusOneMinute() {	
+	public static Date nowDateTime() {	
 		LocalDateTime nowDateTime = LocalDateTime.now();
 		LocalDateTime startTime = LocalDateTime.of(
 				  nowDateTime.getYear()
 				, nowDateTime.getMonth()
 				, nowDateTime.getDayOfMonth()
 				, nowDateTime.getHour()
-				, nowDateTime.getMinute() + 1
+				, nowDateTime.getMinute()
 				, 0);
 		
 		

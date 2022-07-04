@@ -12,6 +12,7 @@ import org.apache.logging.log4j.Logger;
 
 import fcmpush.config.DataBaseConfig;
 import fcmpush.config.FireBaseConfig;
+import fcmpush.config.PropertiesConfig;
 import fcmpush.enumeration.FireBaseEnum;
 import fcmpush.enumeration.IntervalEnum;
 import fcmpush.exception.ErrorHandler;
@@ -35,22 +36,23 @@ public class Main {
 	public static void run() {
 
 		try {	
-			FireBaseConfig.init();			
+			FireBaseConfig.init();
+			Thread.sleep(1000);
 			
-			// 수신그룹 만들기 스레드
-			Timer receiveGroupTimer = new Timer();
-			TimerTask makeReceiveGroupTask = new TimerTask() {			
-				@Override
-				public void run() {
-					DataBaseConfig.init();
-					
-					PushGroupThread groupThread = new PushGroupThread();
-					groupThread.run();
-				}			
-			};
-			receiveGroupTimer.scheduleAtFixedRate(makeReceiveGroupTask, DateUtil.nowDateTimePlusOneMinute() , 1000 * 20);
-			
-			// 푸쉬 스레드
+//			// 수신그룹 만들기 스레드
+//			Timer receiveGroupTimer = new Timer();
+//			TimerTask makeReceiveGroupTask = new TimerTask() {			
+//				@Override
+//				public void run() {
+//					DataBaseConfig.init();
+//					
+//					PushGroupThread groupThread = new PushGroupThread();
+//					groupThread.run();
+//				}			
+//			};
+//			receiveGroupTimer.scheduleAtFixedRate(makeReceiveGroupTask, DateUtil.tomorrowFourAm() , IntervalEnum.All_GROUP_CREATE_INTERVAL.getInterval());
+//			
+//			// 푸쉬 스레드
 //			Timer pushTimer = new Timer();
 //			TimerTask pushTask = new TimerTask() {
 //				@Override
@@ -59,9 +61,8 @@ public class Main {
 //					pushThread.run();
 //				}
 //			};
-//			pushTimer.scheduleAtFixedRate(pushTask, 0, 1000 * 10);
+//			pushTimer.scheduleAtFixedRate(pushTask, DateUtil.nowDateTime(), IntervalEnum.PUSH_CHECK_INTERVAL.getInterval());		
 			
-			Thread.sleep(1000);
 		}
 
 		catch (RuntimeException e) {

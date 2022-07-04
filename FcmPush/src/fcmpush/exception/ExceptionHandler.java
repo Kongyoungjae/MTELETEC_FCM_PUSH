@@ -9,6 +9,7 @@ import org.apache.logging.log4j.Logger;
 import com.google.firebase.messaging.FirebaseMessagingException;
 
 import fcmpush.main.Main;
+import fcmpush.util.StackTraceLogUtil;
 
 public class ExceptionHandler extends RuntimeException {
 
@@ -17,7 +18,8 @@ public class ExceptionHandler extends RuntimeException {
 
 	public ExceptionHandler(RuntimeException e) {
 		logger.error("@@@RuntimeException 익셉션 @@@");
-		e.printStackTrace();
+		// e.printStackTrace();
+		StackTraceLogUtil.getStackTraceString(e);
 		Main.run();
 	}
 

@@ -2,9 +2,9 @@
 <Configuration>
 
 	<Properties>
-		<Property name="fPath">/logs/spamansim</Property>
-		<Property name="fName">${fPath}/spamansim.log</Property>
-		<Property name="fPattern">${fPath}/spamansim_%d{yyyy-MM-dd-HH}.log
+		<Property name="fPath">/logs/fcmPush</Property>
+		<Property name="fName">${fPath}/fcmPush.log</Property>
+		<Property name="fPattern">${fPath}/fcmPush_%d{yyyy-MM-dd-HH}.log
 		</Property>
 		<Property name="layoutPattern">[%t] %d{yyyy-MM-dd HH:mm:ss} %-5level [%logger] %m%n</Property>
 	</Properties>
@@ -24,7 +24,7 @@
 			</Policies>
 			<DefaultRolloverStrategy>
 				<Delete basePath="${fPath}/" maxDepth="1">
-					<IfFileName glob="spamansim_*" />
+					<IfFileName glob="fcmPush_*" />
 					<IfLastModified age="14d" />
 				</Delete>
 			</DefaultRolloverStrategy>
@@ -33,7 +33,6 @@
 	</Appenders>
 
 	<loggers>
-
 		<root level="INFO">
 			<appender-ref ref="console" />
 			<appender-ref ref="file" />

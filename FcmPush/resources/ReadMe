@@ -3,9 +3,9 @@
 1. 트랜잭션 처리 
 2. 타겟 구분별 푸쉬 O
 3. 전체 프로세스 잘 도는지 확인 △
-4. 에러처리, 익셉션 △
+4. 에러처리, 익셉션 O
 5. 푸쉬시간 동안 발송을 완료하지 못한경우 다음스레드 루프시 어떻게 될까  X
-6. 중복 그룹방지 (하나의 토큰이 여러개의 그룹을 가지면안됌) O (매일4시마다 모든 그룹삭제 후 재생성)
+6. 중복 그룹방지 (하나의 토큰이 여러개의 그룹을 가지면안됌) O 
 7. 푸쉬가 많을경우 타임아웃 에러
 8. FCM 서버가 주제 전송 요청에 성공 또는 실패 응답을 반환하는 데 최대 30초의 지연이 발생할 수 있습니다. 요청에서 이 지연 시간에 맞게 앱 서버 제한 시간 값을 설정해야 합니다. (document)
 
@@ -37,6 +37,46 @@
    	  You should consider either expiring and/or testing connection validity before use in your application, 
    	  increasing the server configured values for client timeouts, or using the Connector/J connection property 'autoReconnect=true' 
    	  to avoid this problem.
+	   : com.google.firebase.messaging.FirebaseMessagingException: Internal error encountered. (알수없는 내부오류)
+		at com.google.firebase.messaging.FirebaseMessagingException.withMessagingErrorCode(FirebaseMessagingException.java:51)
+		at com.google.firebase.messaging.FirebaseMessagingClientImpl$MessagingErrorHandler.createException(FirebaseMessagingClientImpl.java:293)
+		at com.google.firebase.messaging.FirebaseMessagingClientImpl$MessagingErrorHandler.createException(FirebaseMessagingClientImpl.java:282)
+		at com.google.firebase.internal.AbstractHttpErrorHandler.handleHttpResponseException(AbstractHttpErrorHandler.java:57)
+		at com.google.firebase.internal.ErrorHandlingHttpClient.send(ErrorHandlingHttpClient.java:108)
+		at com.google.firebase.internal.ErrorHandlingHttpClient.sendAndParse(ErrorHandlingHttpClient.java:72)
+		at com.google.firebase.messaging.FirebaseMessagingClientImpl.sendSingleRequest(FirebaseMessagingClientImpl.java:127)
+		at com.google.firebase.messaging.FirebaseMessagingClientImpl.send(FirebaseMessagingClientImpl.java:113)
+		at com.google.firebase.messaging.FirebaseMessaging$1.execute(FirebaseMessaging.java:137)
+		at com.google.firebase.messaging.FirebaseMessaging$1.execute(FirebaseMessaging.java:134)
+		at com.google.firebase.internal.CallableOperation.call(CallableOperation.java:36)
+		at com.google.firebase.messaging.FirebaseMessaging.send(FirebaseMessaging.java:104)
+		at com.google.firebase.messaging.FirebaseMessaging.send(FirebaseMessaging.java:86)
+		at fcmpush.service.target.GroupTarget.push(GroupTarget.java:35)
+		at fcmpush.service.FireBasePushService.pushProcess(FireBasePushService.java:53)
+		at fcmpush.thread.FireBasePushThread.run(FireBasePushThread.java:21)
+		at fcmpush.main.Main$1.run(Main.java:60)
+		at java.util.TimerThread.mainLoop(Timer.java:555)
+		at java.util.TimerThread.run(Timer.java:505)
+	Caused by: com.google.api.client.http.HttpResponseException: 500 Internal Server Error
+	POST https://fcm.googleapis.com/v1/projects/mteletec-test/messages:send
+	{
+	  "error": {
+	    "code": 500,
+	    "message": "Internal error encountered.",
+	    "status": "INTERNAL",
+	    "details": [
+	      {
+	        "@type": "type.googleapis.com/google.firebase.fcm.v1.FcmError",
+	        "errorCode": "INTERNAL"
+	      }
+	    ]
+	  }
+	}
+	
+		at com.google.api.client.http.HttpRequest.execute(HttpRequest.java:1116)
+		at com.google.firebase.internal.ErrorHandlingHttpClient.send(ErrorHandlingHttpClient.java:96)
+		... 14 more
+		
    :  푸쉬가 많을경우 타임아웃 에러 너무 많은 전송요청 발생 (INTERVAL을 좀더줘야하나..?)
      
  **푸쉬 테스트 케이스
@@ -49,7 +89,6 @@
     
     CASE4    O       O       O        O        O          O         =>  OK (다른 USER아이디로 테스트 하니까 됨)
     
-    :그룹15번에 발송해야함 (2건)
 
     
  **그룹화 테스트 케이스	
@@ -58,12 +97,19 @@
    - 첫배포 (아무것도없음)
      : 그룹스레드: 현재 오전 4시 -> 그룹스레드 실행 -> 그룹만듬 
      : 푸쉬스레드: 오전 10시 (첫푸쉬) -> 푸쉬예정 -> 04:00 ~ 10:00 6명 가입 
-     : 결과(잘됨)
+     : 결과: 정상적으로 그룹생성 완료
      
    - 배포후 다음날
-     :
-     
+     : 그룹스레드: 모든그룹 초기화 및 푸쉬가 있을경우 4시이후 처리진행
+     : 푸쉬스레드: X
+     : 결과: 잘댐
    -
+   
+ **수행시간
+   1분 -> 6만명 전송 1000TPS
+   
+   
+   
      
      
      

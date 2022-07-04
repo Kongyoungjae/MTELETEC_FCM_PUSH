@@ -204,6 +204,7 @@ public class FireBaseRepository {
 		try {
 			session.delete(query);
 		} catch ( Exception e ) {
+			session.rollback();
 			logger.error("exception/ SMSdao::selectOne()"+StackTraceLogUtil.getStackTraceString(e));
 		} finally {
 			session.commit();
@@ -212,18 +213,17 @@ public class FireBaseRepository {
 	}
 
 	// 푸쉬그룹 INSERT
-	public void insertPushGroup(HashMap<String, Object> param) {
-		
-		String query = "insertPushGroup";
-		
+	public void insertPushGroup(List<HashMap<String, Object>> param) {
+		String query = "insertPushGroup";	
 		SqlSession session = dbconfig.getAdminSession();
 
 		if( session == null ) {
 			logger.info("sqlSession is null. not running query.");
 		}
 		try {
-			session.insert(query,param);
-
+			for(HashMap<String, Object> map : param) {
+				session.insert(query,map);
+			}		
 		} catch ( Exception e ) {
 			session.rollback();
 			logger.error("exception/ SMSdao::selectOne()"+StackTraceLogUtil.getStackTraceString(e));
@@ -245,7 +245,6 @@ public class FireBaseRepository {
 		}
 		try {
 			session.insert(query , param);
-
 		} catch ( Exception e ) {
 			session.rollback();
 			logger.error("exception/ SMSdao::selectOne()"+StackTraceLogUtil.getStackTraceString(e));
