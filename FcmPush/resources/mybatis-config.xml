@@ -19,11 +19,6 @@
 			 	<property name="url" value="${admin_url}"/>
 			 	<property name="username" value="${admin_id}"/>
 			 	<property name="password" value="${admin_pw}"/>
-<!-- 			 	 특정 시간마다 validationQuery를 실행 셋팅 시작  -->
-<!-- 		        <property name="poolPingEnabled" value="true" /> -->
-<!-- 				<property name="poolPingQuery" value="SELECT 1" /> -->
-<!-- 				<property name="poolPingConnectionsNotUsedFor" value="1000" /> -->
-<!--       			 특정 시간마다 validationQuery를 실행 셋팅 끝  -->
 			 </dataSource>
 		</environment>
 		<environment id="service">
@@ -33,9 +28,6 @@
 			 	<property name="url" value="${service_url}"/>
 			 	<property name="username" value="${service_id}"/>
 			 	<property name="password" value="${service_pw}"/>
-<!-- 		        <property name="poolPingEnabled" value="true" /> -->
-<!-- 				<property name="poolPingQuery" value="SELECT 1" /> -->
-<!-- 				<property name="poolPingConnectionsNotUsedFor" value="7200000" /> -->
 			 </dataSource>
 		</environment>
 	</environments>

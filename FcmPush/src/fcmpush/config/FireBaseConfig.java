@@ -27,9 +27,7 @@ public class FireBaseConfig  {
 			firebaseMessaging = FirebaseMessaging.getInstance(fireBaseApp);
 	}
 	
-	//ADC 인증
 	private static void initFireBaseApp() throws IOException {
-
 		InputStream resource = Resources.getResourceAsStream(FireBaseEnum.KEY_PATH.getValue());
 		FirebaseOptions options = FirebaseOptions.builder()
 				.setCredentials(GoogleCredentials.fromStream(resource))
@@ -40,5 +38,9 @@ public class FireBaseConfig  {
 	
 	public static synchronized FirebaseApp getInstanceFireBaseApp(){
 		return fireBaseApp; 
+	}
+	
+	public static synchronized FirebaseMessaging getInstanceFireBaseMessaging(){
+		return firebaseMessaging; 
 	}
 }

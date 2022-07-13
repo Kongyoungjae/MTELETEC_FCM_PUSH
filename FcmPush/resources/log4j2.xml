@@ -16,7 +16,6 @@
 		</Console>
 		<RollingFile name="file" fileName="${fName}"
 			filePattern="${fPattern}" append="true">
-
 			<PatternLayout pattern="${layoutPattern}" />
 			<Policies>
 				<TimeBasedTriggeringPolicy interval="1"
@@ -35,8 +34,11 @@
 	<loggers>
 		<root level="INFO">
 			<appender-ref ref="console" />
-			<appender-ref ref="file" />
+			<appender-ref ref="file"/>
 		</root>
+<!-- 		<logger name="fcmpush" level="error" > -->
+<!-- 			<appender-ref ref="file"/> -->
+<!--         </logger> -->
         <logger name="log4jdbc.log4j2" level="error" additivity="false">
             <appender-ref ref="console" />
         </logger>
@@ -44,6 +46,7 @@
         <!-- QUERY LOG -->
         <logger name="jdbc.sqlonly" additivity="false" level="INFO">
             <appender-ref ref="console" />
+            <appender-ref ref="file"/>
         </logger>
 
 		<!-- RESULTSET TABLE -->

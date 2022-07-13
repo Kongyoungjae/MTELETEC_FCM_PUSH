@@ -24,8 +24,6 @@ public class FireBasePushService {
 	}
 	
 	public void pushProcess(HashMap<String, Object> nowDateTime) throws InterruptedException, FirebaseMessagingException, IOException {		
-		long start = System.currentTimeMillis();
-
 		if(0 == repository.selectPushGroupCount()) {
 			PushGroupService pushGroupService = new PushGroupService();
 			pushGroupService.groupProcess();
@@ -43,19 +41,14 @@ public class FireBasePushService {
 				logger.info("오늘 n번쨰 푸쉬");
 				HashMap<String, Object> lastPushTime  = repository.selectPushHistLastPushTime();				
 				List<String> tokens = repository.selectJoinUsersTokenAfterLastPushTime(lastPushTime);
-				logger.info("마지막 푸쉬 시간이후 가입자수:"+tokens.size());
+				logger.info("마지막 푸쉬 시간이후 등록된 토큰수:"+tokens.size());
 				pushGroupService.createReceiveGroupJoinedAfter4amToday(tokens);
-			}
-			
+			}	
 			for(HashMap<String, Object> pushInfo : pushList) {
 				PushTarget target = PushTargetFactory.createPushTarget(pushInfo);
-				target.push(pushInfo);
-							
+				target.push(pushInfo);			
 			}
 		}
-		
-		long end = System.currentTimeMillis();
-		logger.info("수행시간: " + (end - start) / 1000 + "s");
 	}
 	
 	//현재시간 = DB 발송시간
@@ -65,8 +58,7 @@ public class FireBasePushService {
 		}
 		return false;
 	}
-	
-	
+		
 	//같은 시간에 여러 PUSH건에 대해 한건이라도 HIST테이블에 데이터가 있으면 False
 	private boolean notDuplicatePush(List<HashMap<String, Object>> pushList) {
 		for(HashMap<String, Object> pushID : pushList) {		

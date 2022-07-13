@@ -18,7 +18,7 @@ public class ExceptionHandler extends RuntimeException {
 
 	public ExceptionHandler(RuntimeException e) {
 		logger.error("@@@RuntimeException 익셉션 @@@");
-		// e.printStackTrace();
+		e.printStackTrace();
 		StackTraceLogUtil.getStackTraceString(e);
 		Main.run();
 	}
@@ -26,15 +26,18 @@ public class ExceptionHandler extends RuntimeException {
 	public ExceptionHandler(InterruptedException e) {
 		logger.error("@@@InterruptedException 익셉션 @@@");
 		e.printStackTrace();
+		Main.run();
 	}
 
 	public ExceptionHandler(FirebaseMessagingException e) {
 		logger.error("@@@FirebaseMessagingException 익셉션 @@@");
 		e.printStackTrace();
+		Main.run();
 	}
 
 	public ExceptionHandler(IOException e) {
 		logger.error("@@@FirebaseMessagingException 익셉션 @@@");
 		e.printStackTrace();
+		Main.run();
 	}
 }

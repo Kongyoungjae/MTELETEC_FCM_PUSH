@@ -39,30 +39,28 @@ public class Main {
 			FireBaseConfig.init();
 			Thread.sleep(1000);
 			
-//			// 수신그룹 만들기 스레드
-//			Timer receiveGroupTimer = new Timer();
-//			TimerTask makeReceiveGroupTask = new TimerTask() {			
-//				@Override
-//				public void run() {
-//					DataBaseConfig.init();
-//					
-//					PushGroupThread groupThread = new PushGroupThread();
-//					groupThread.run();
-//				}			
-//			};
-//			receiveGroupTimer.scheduleAtFixedRate(makeReceiveGroupTask, DateUtil.tomorrowFourAm() , IntervalEnum.All_GROUP_CREATE_INTERVAL.getInterval());
-//			
-//			// 푸쉬 스레드
-//			Timer pushTimer = new Timer();
-//			TimerTask pushTask = new TimerTask() {
-//				@Override
-//				public void run() {
-//					FireBasePushThread pushThread = new FireBasePushThread();
-//					pushThread.run();
-//				}
-//			};
-//			pushTimer.scheduleAtFixedRate(pushTask, DateUtil.nowDateTime(), IntervalEnum.PUSH_CHECK_INTERVAL.getInterval());		
+			// 수신그룹 만들기 스레드
+			Timer receiveGroupTimer = new Timer();
+			TimerTask makeReceiveGroupTask = new TimerTask() {			
+				@Override
+				public void run() {
+					DataBaseConfig.init();					
+					PushGroupThread groupThread = new PushGroupThread();
+					groupThread.run();
+				}			
+			};
+			receiveGroupTimer.scheduleAtFixedRate(makeReceiveGroupTask, DateUtil.tomorrowFourAm() , IntervalEnum.All_GROUP_CREATE_INTERVAL.getInterval());
 			
+			// 푸쉬 스레드			
+			Timer pushTimer = new Timer();
+			TimerTask pushTask = new TimerTask() {
+				@Override
+				public void run() {
+					FireBasePushThread pushThread = new FireBasePushThread();
+					pushThread.run();
+				}
+			};
+			pushTimer.scheduleAtFixedRate(pushTask, DateUtil.nowDateTime(), IntervalEnum.PUSH_CHECK_INTERVAL.getInterval());			
 		}
 
 		catch (RuntimeException e) {

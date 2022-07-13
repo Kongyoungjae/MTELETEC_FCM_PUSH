@@ -1,7 +1,9 @@
 package fcmpush.service.target;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import com.google.firebase.messaging.BatchResponse;
 import com.google.firebase.messaging.FirebaseMessagingException;
@@ -14,16 +16,19 @@ public class GroupTarget extends PushTarget {
 
 	@Override
 	public void push(HashMap<String, Object> pushInfo) throws FirebaseMessagingException {
-		int groupseq = repository.selectMaxGroupSEQ();
+		int groupNo = repository.selectMaxGroupNo();
 		String title = pushInfo.get("TITLE").toString();
 		String body = pushInfo.get("BODY").toString();
 		String img =  pushInfo.get("IMG").toString();
 		
 		
-		logger.info("그룹푸쉬 그룹숫자:"+groupseq);
+		logger.info("발송수:"+groupNo);
 		logger.info("푸쉬정보:" + pushInfo.toString());
 		
-		for(int i=1; i <= groupseq; i++) {
+		// List<Message> 담아서 해보자
+		List<Message> messages = new ArrayList<Message>();
+		
+		for(int i=1; i <= groupNo; i++) {
 			Message message = Message.builder()
 					.setNotification(Notification.builder()
 							.setTitle(title)
@@ -32,8 +37,9 @@ public class GroupTarget extends PushTarget {
 							.build())
 					.setTopic(FireBaseEnum.GROUP_NAME.getValue()+i)
 					.build();
-			fireBaseMessaging.send(message);
+			messages.add(message);
 		}
+		fireBaseMessaging.sendAll(messages);
 		
 		HashMap<String, Object> paramMap = new HashMap<String, Object>();
 		paramMap.put("PUSH_ID", pushInfo.get("PUSH_ID"));

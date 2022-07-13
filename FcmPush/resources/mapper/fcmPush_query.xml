@@ -21,7 +21,6 @@
         ]]>
     </select>
     
-    <!-- duplicate 관련 이름으로 바꾸면 좋을거같다 -->
     <select id="selectPushHistCountByPushID" parameterType="map" resultType="int" >   
     	SELECT 
     		COUNT(T1.SEQ)
@@ -31,16 +30,22 @@
 	      AND SENT = 'Y'
     </select>
     
-    <select id="selectUsersAllTokenBefore4AM" parameterType="map" resultType="String" >
+    <select id="selectUserTokenByFcmGroupId" parameterType="map" resultType="String" >
         SELECT 
         	FCM_TOKEN
         FROM TB_USER
-        WHERE
-        <![CDATA[
+        WHERE 
+		<![CDATA[
         	REG_DT < DATE_FORMAT(NOW(),'%Y-%m%-%d 04:00:00')
         ]]>
+        <if test='FCM_GROUP_ID != null and FCM_GROUP_ID != ""'>
+        	AND FCM_GROUP_ID = #{FCM_GROUP_ID}
+        </if>       
         GROUP BY FCM_TOKEN 
 	    ORDER BY MIN(REG_DT) ASC
+	    <if test='FCM_GROUP_ID != null and FCM_GROUP_ID != ""'>
+        LIMIT 1000
+        </if>
     </select>
     
     <select id="selectTodayUsersTokenAfter4AM" parameterType="map" resultType="String" >
@@ -49,8 +54,7 @@
         FROM TB_USER
         WHERE
         <![CDATA[
-        	REG_DT >= DATE_FORMAT(DATE_SUB(NOW(),INTERVAL 1 DAY),'%Y-%m%-%d 04:00:00') 
-     	AND REG_DT <= DATE_FORMAT(NOW(),'%Y-%m%-%d 04:00:00')
+        	REG_DT >= DATE_FORMAT(NOW(),'%Y-%m%-%d 04:00:00')
         ]]>
         GROUP BY FCM_TOKEN 
 	    ORDER BY MIN(REG_DT) ASC
@@ -62,7 +66,7 @@
         FROM TB_USER
         WHERE
         <![CDATA[
-        	REG_DT >= DATE_FORMAT(#{REL_DT},'%Y-%m%-%d %H:%i:%s')
+        	REG_DT > DATE_FORMAT(#{REL_DT},'%Y-%m%-%d %H:%i:%s')
         ]]>
         GROUP BY FCM_TOKEN 
 	    ORDER BY MIN(REG_DT) ASC
@@ -89,24 +93,33 @@
 		]]>
     </select>
     
+    <select id="selectUserGroupIdList" resultType="string" >
+        SELECT 
+        	FCM_GROUP_ID
+		  FROM TB_USER
+		WHERE FCM_GROUP_ID IS NOT NULL
+		GROUP BY FCM_GROUP_ID
+		ORDER BY FCM_GROUP_ID
+    </select>
+    
     <select id="selectPushGroupCount" parameterType="map" resultType="int" >   
 		SELECT COUNT(*)
 		  FROM TB_PUSH_GROUP
     </select>
         
-    <select id="selectTodayCreatedPushGroupCountAfter4AM" parameterType="map" resultType="int" >   
-		SELECT COUNT(*)
-		  FROM TB_PUSH_GROUP 
-		WHERE 
-		<![CDATA[ 
-			REG_DT >= DATE_FORMAT(DATE_SUB(NOW(),INTERVAL 1 DAY),'%Y-%m%-%d 04:00:00') 
-     	AND REG_DT <= DATE_FORMAT(NOW(),'%Y-%m%-%d 04:00:00')
-		]]>
-    </select>
+<!--     <select id="selectTodayCreatedPushGroupCountAfter4AM" parameterType="map" resultType="int" >    -->
+<!-- 		SELECT COUNT(*) -->
+<!-- 		  FROM TB_PUSH_GROUP  -->
+<!-- 		WHERE  -->
+<!-- 		<![CDATA[  -->
+<!-- 			REG_DT >= DATE_FORMAT(DATE_SUB(NOW(),INTERVAL 1 DAY),'%Y-%m%-%d 04:00:00')  -->
+<!--      	AND REG_DT <= DATE_FORMAT(NOW(),'%Y-%m%-%d 04:00:00') -->
+<!-- 		]]> -->
+<!--     </select> -->
     
     <select id="selectTodayMinGroupSeqAfter4am" resultType="int">
 	  SELECT 
-	  	 IFNULL(MIN(GROUP_SEQ),0)
+	  	 IFNULL(MIN(GROUP_NO),0)
  	  FROM TB_PUSH_GROUP
  	  WHERE
  	  <![CDATA[
@@ -116,18 +129,16 @@
      LIMIT 1
     </select>
     
-    <select id="selectMaxGroupSEQ" resultType="int">
+    <select id="selectMaxGroupNo" resultType="int">
     	SELECT 
-    		IFNULL(MAX(GROUP_SEQ),0)
+    		IFNULL(MAX(GROUP_NO),0)
     	  FROM TB_PUSH_GROUP
     </select>
    			    
-    
-    
     <insert id="insertPushGroup">
     	INSERT INTO TB_PUSH_GROUP
    		(
-    		GROUP_SEQ
+    		GROUP_NO
    		   ,GROUP_ID
    		   ,REG_SUCCESS_CNT
    		   ,REG_FAIL_CNT
@@ -135,7 +146,7 @@
    		)
    		VALUES 
    		(
-   		    #{GROUP_SEQ}
+   		    #{GROUP_NO}
    		   ,#{GROUP_ID}
    		   ,#{REG_SUCCESS_CNT}
    		   ,#{REG_FAIL_CNT}
@@ -166,11 +177,19 @@
    		   ,'Y'
    		)
     </insert>
-
+   
     <delete id="deleteAllPushGroups"> 
     	DELETE 
     	 FROM TB_PUSH_GROUP 
     	WHERE 1=1
     </delete>
-
+    
+    <update id="updateUserFcmGroup" parameterType="map">
+    	UPDATE TB_USER
+			SET FCM_GROUP_ID = #{FCM_GROUP_ID}
+		WHERE FCM_TOKEN IN 
+		<foreach collection="FCM_TOKEN" item="FCM_TOKEN" separator="," open="(" close=")">
+			#{FCM_TOKEN}
+		</foreach>
+	</update>
 </mapper>

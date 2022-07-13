@@ -108,8 +108,8 @@ public class FireBaseRepository {
 	
 	
 	// 오전 4시이전 가입한 토큰 가져오기
-	public List<String> selectUsersAllTokenBefore4AM() {
-		String query = "selectUsersAllTokenBefore4AM";
+	public List<String> selectUserTokenByFcmGroupId(HashMap<String, Object> map) {
+		String query = "selectUserTokenByFcmGroupId";
 		List<String> tokens = new ArrayList<String>();
 
 		SqlSession session = dbconfig.getServiceSession();
@@ -119,7 +119,7 @@ public class FireBaseRepository {
 			return null;
 		}
 		try {
-			tokens = session.selectList(query);
+			tokens = session.selectList(query , map);
 		} catch ( Exception e ) {
 			logger.error("exception/ SMSdao::selectOne()"+StackTraceLogUtil.getStackTraceString(e));
 		} finally {
@@ -171,8 +171,8 @@ public class FireBaseRepository {
 		return tokens;
 	}
 	
-	public int selectMaxGroupSEQ() {
-		final String query = "selectMaxGroupSEQ";
+	public int selectMaxGroupNo() {
+		final String query = "selectMaxGroupNo";
 		int count = 0;
 			
 		SqlSession s = dbconfig.getAdminSession();
@@ -190,68 +190,6 @@ public class FireBaseRepository {
 		}
 		
 		return count;
-	}
-	// 모든 푸쉬 그룹 삭제
-	public void deleteAllPushGroups() {
-		String query = "deleteAllPushGroups";
-		
-		SqlSession session = dbconfig.getAdminSession();
-
-		if( session == null ) {
-			logger.info("sqlSession is null. not running query.");
-			throw new NullPointerException();
-		}
-		try {
-			session.delete(query);
-		} catch ( Exception e ) {
-			session.rollback();
-			logger.error("exception/ SMSdao::selectOne()"+StackTraceLogUtil.getStackTraceString(e));
-		} finally {
-			session.commit();
-			session.close();
-		}
-	}
-
-	// 푸쉬그룹 INSERT
-	public void insertPushGroup(List<HashMap<String, Object>> param) {
-		String query = "insertPushGroup";	
-		SqlSession session = dbconfig.getAdminSession();
-
-		if( session == null ) {
-			logger.info("sqlSession is null. not running query.");
-		}
-		try {
-			for(HashMap<String, Object> map : param) {
-				session.insert(query,map);
-			}		
-		} catch ( Exception e ) {
-			session.rollback();
-			logger.error("exception/ SMSdao::selectOne()"+StackTraceLogUtil.getStackTraceString(e));
-		} finally {
-			session.commit();
-			session.close();
-		}
-	}
-	
-	// 푸쉬이력 INSERT
-	public void insertPushHist(HashMap<String, Object> param) {
-		
-		String query = "insertPushHist";
-		
-		SqlSession session = dbconfig.getAdminSession();
-
-		if( session == null ) {
-			logger.info("sqlSession is null. not running query.");
-		}
-		try {
-			session.insert(query , param);
-		} catch ( Exception e ) {
-			session.rollback();
-			logger.error("exception/ SMSdao::selectOne()"+StackTraceLogUtil.getStackTraceString(e));
-		} finally {
-			session.commit();
-			session.close();
-		}
 	}
 	
 	//오늘 4시 이후 가장작은 그룹순번 
@@ -277,26 +215,26 @@ public class FireBaseRepository {
 	}
 
 	//오늘 오후 4시이후 만들어진 푸쉬그룹 카운트
-	public int selectTodayCreatedPushGroupCountAfter4AM() {
-		final String query = "selectTodayCreatedPushGroupCountAfter4AM";
-		int count = 0;
-			
-		SqlSession s = dbconfig.getAdminSession();
-		if( s == null ) {
-			logger.info("sqlSession is null. not running query.");
-			throw new NullPointerException();
-		}
-		
-		try {
-			count = s.selectOne(query);
-		} catch ( Exception e ) {
-			logger.error("exception/ SMSdao::selectOne()"+StackTraceLogUtil.getStackTraceString(e));
-		} finally {
-			s.close();
-		}
-		
-		return count;
-	}
+//	public int selectTodayCreatedPushGroupCountAfter4AM() {
+//		final String query = "selectTodayCreatedPushGroupCountAfter4AM";
+//		int count = 0;
+//			
+//		SqlSession s = dbconfig.getAdminSession();
+//		if( s == null ) {
+//			logger.info("sqlSession is null. not running query.");
+//			throw new NullPointerException();
+//		}
+//		
+//		try {
+//			count = s.selectOne(query);
+//		} catch ( Exception e ) {
+//			logger.error("exception/ SMSdao::selectOne()"+StackTraceLogUtil.getStackTraceString(e));
+//		} finally {
+//			s.close();
+//		}
+//		
+//		return count;
+//	}
 
 	public int selectPushGroupCount() {
 		final String query = "selectPushGroupCount";
@@ -317,5 +255,106 @@ public class FireBaseRepository {
 		}
 		
 		return count;
+	}
+
+	public List<String> selectUserGroupIdList() {
+		String query = "selectUserGroupIdList";
+		List<String> groupIdList = new ArrayList<String>();
+		
+		SqlSession session = dbconfig.getServiceSession();
+
+		if( session == null ) {
+			logger.info("sqlSession is null. not running query.");
+			return null;
+		}
+		try {
+			groupIdList = session.selectList(query);
+		} catch ( Exception e ) {
+			logger.error("exception/ SMSdao::selectOne()"+StackTraceLogUtil.getStackTraceString(e));
+		} finally {
+			session.close();
+		}
+		
+		return groupIdList;
+	}
+	
+	// 모든 푸쉬 그룹 삭제
+	public void deleteAllPushGroups() {
+		String query = "deleteAllPushGroups";
+		
+		SqlSession session = dbconfig.getAdminSession();
+
+		if( session == null ) {
+			logger.info("sqlSession is null. not running query.");
+			throw new NullPointerException();
+		}
+		try {
+			session.delete(query);
+		} catch ( Exception e ) {
+			session.rollback();
+			logger.error("exception/ SMSdao::selectOne()"+StackTraceLogUtil.getStackTraceString(e));
+		} finally {
+			session.commit();
+			session.close();
+		}
+	}
+
+	// 푸쉬그룹 INSERT
+	public void insertPushGroup(HashMap<String, Object> param) {
+		String query = "insertPushGroup";	
+		SqlSession session = dbconfig.getAdminSession();
+
+		if( session == null ) {
+			logger.info("sqlSession is null. not running query.");
+		}
+		try {
+			session.insert(query , param);	
+		} catch ( Exception e ) {
+			session.rollback();
+			logger.error("exception/ SMSdao::selectOne()"+StackTraceLogUtil.getStackTraceString(e));
+		} finally {
+			session.commit();
+			session.close();
+		}
+	}
+	
+	// 푸쉬이력 INSERT
+	public void insertPushHist(HashMap<String, Object> param) {		
+		String query = "insertPushHist";
+		
+		SqlSession session = dbconfig.getAdminSession();
+
+		if( session == null ) {
+			logger.info("sqlSession is null. not running query.");
+			throw new NullPointerException();
+		}
+		try {
+			session.insert(query , param);
+		} catch ( Exception e ) {
+			session.rollback();
+			logger.error("exception/ SMSdao::selectOne()"+StackTraceLogUtil.getStackTraceString(e));
+		} finally {
+			session.commit();
+			session.close();
+		}
+	}
+	
+	public void updateUserFcmGroup(HashMap<String, Object> paramMap) {
+		String query = "updateUserFcmGroup";
+		SqlSession session = dbconfig.getServiceSession();
+		
+		if( session == null ) {
+			logger.info("sqlSession is null. not running query.");
+			throw new NullPointerException();
+		}
+		try {
+			session.update(query , paramMap);
+		} catch ( Exception e ) {
+			session.rollback();
+			logger.error("exception/ SMSdao::selectOne()"+StackTraceLogUtil.getStackTraceString(e));
+		} finally {
+			session.commit();
+			session.close();
+		}
 	}
 }
